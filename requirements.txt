@@ -1,0 +1,7 @@
+PyQt5
+stringcase
+bidict
+lxml
+beautifulsoup4
+htmlmin
+networkx

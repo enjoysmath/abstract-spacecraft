@@ -1,0 +1,1 @@
+python -m nuitka --onefile --windows-icon-from-ico=img/galaxy.ico --plugin-enable=pyqt5 --windows-disable-console abstract_spacecraft.py

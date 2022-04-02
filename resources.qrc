@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/galaxy.ico</file>
+        <file>img/navigate_back.ico</file>
+        <file>img/navigate_forward.ico</file>
+        <file>img/arrow.ico</file>
+        <file>img/letter_T.png</file>
+        <file>img/book_lookup.png</file>
+        <file>img/pencil_sketch.png</file>
+    </qresource>
+</RCC>

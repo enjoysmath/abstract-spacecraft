@@ -1,0 +1,14 @@
+
+Bug List
+--------
+
+1. Arrow to/from an arrow does not work on arrow shape but instead bounding rect of the arrow, so it doesn't look right when
+  the angle of the arrow is at 45 degrees wrt a screen edge.
+  
+2. Bug where mouse sometimes sticks to control points and won't release the control point.
+
+3. Arrows at a significant diagonal do not point toward center of node.  
+
+4. When label is freed from parent box it also appears unbounded by grandparent box.
+  This resulted from another related bugfix, so we have to correct this probably
+  by adding another shape/box type.

@@ -1,0 +1,18 @@
+
+Feature List
+------------
+
+10. COlor change UndoCmd
+11.  High-level language tools for generating graphs like a kernel
+    sequence from a chain complex.
+
+13. Self-loop arrows are to be moved along with their bezier control points whenever their object (dom=cod) is moved.
+14. Editing text should convert from LaTeX to unicode where appropriate (see Options menu)
+      Use <sub> / <sup> tags for subscripts / superscripts
+7. The graph search feature for logic
+15. Red X's on arrow end points if not connected arrows
+16. Session saving to folder and opening by default (copy code from BananaCats)
+    Should include dock state of various dockwidgets
+
+    
+    

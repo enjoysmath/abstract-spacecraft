@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/abstract_spacecraft.dist
+/abstract_spacecraft.build/static_src
+/abstract_spacecraft.build
+/abstract_spacecraft.onefile-build
+/*.zip
+/*.exe
+/library_search/x64/Debug
+/release

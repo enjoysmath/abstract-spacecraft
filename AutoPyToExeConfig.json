@@ -1,0 +1,81 @@
+{
+ "version": "auto-py-to-exe-configuration_v1",
+ "pyinstallerOptions": [
+  {
+   "optionDest": "noconfirm",
+   "value": true
+  },
+  {
+   "optionDest": "filenames",
+   "value": "C:/Users/FruitfulApproach/Desktop/AbstractSpacecraft/abstract-spacecraft/abstract_spacecraft.py"
+  },
+  {
+   "optionDest": "onefile",
+   "value": true
+  },
+  {
+   "optionDest": "console",
+   "value": true
+  },
+  {
+   "optionDest": "icon_file",
+   "value": "C:/Users/FruitfulApproach/Desktop/AbstractSpacecraft/abstract-spacecraft/img/galaxy.ico"
+  },
+  {
+   "optionDest": "name",
+   "value": "AbstractSpacecraft"
+  },
+  {
+   "optionDest": "ascii",
+   "value": false
+  },
+  {
+   "optionDest": "clean_build",
+   "value": false
+  },
+  {
+   "optionDest": "strip",
+   "value": true
+  },
+  {
+   "optionDest": "noupx",
+   "value": true
+  },
+  {
+   "optionDest": "uac_admin",
+   "value": false
+  },
+  {
+   "optionDest": "uac_uiaccess",
+   "value": false
+  },
+  {
+   "optionDest": "win_private_assemblies",
+   "value": false
+  },
+  {
+   "optionDest": "win_no_prefer_redirects",
+   "value": false
+  },
+  {
+   "optionDest": "bootloader_ignore_signals",
+   "value": false
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/FruitfulApproach/Desktop/AbstractSpacecraft/abstract-spacecraft/standard_library;standard_library/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/FruitfulApproach/Desktop/AbstractSpacecraft/abstract-spacecraft/standard_library/test.\ud83c\udf0c;."
+  },
+  {
+   "optionDest": "resources",
+   "value": "C:/Users/FruitfulApproach/Desktop/AbstractSpacecraft/abstract-spacecraft/resources.qrc"
+  }
+ ],
+ "nonPyinstallerOptions": {
+  "increaseRecursionLimit": true,
+  "manualArguments": ""
+ }
+}
