@@ -1,9 +1,9 @@
-from ui_debug_watch_widget import Ui_DebugWatchWidget
+from ui.ui_debug_watch_widget import Ui_DebugWatchWidget
 from PyQt5.QtWidgets import QWidget, QGraphicsEllipseItem, QGraphicsPathItem, QGridLayout
 from PyQt5.QtGui import QPainterPath, QPen, QBrush, QColor
 from PyQt5.QtCore import QRectF, pyqtSignal
-from qt_tools import css_color, generate_random_color
-from line_edit import LineEdit
+from core.qt_tools import css_color, generate_random_color
+from widget.line_edit import LineEdit
 import math
 
 class DebugWatchWidget(QWidget, Ui_DebugWatchWidget):

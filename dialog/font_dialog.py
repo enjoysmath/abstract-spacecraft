@@ -1,4 +1,4 @@
-from ui_font_dialog import Ui_FontDialog
+from ui.ui_font_dialog import Ui_FontDialog
 from PyQt5.QtWidgets import QDialog, QApplication
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import pyqtSignal

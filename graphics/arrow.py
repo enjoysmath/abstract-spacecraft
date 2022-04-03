@@ -1,24 +1,24 @@
-from connectable import Connector, Connectable
+from graphics.connectable import Connector, Connectable
 from PyQt5.QtCore import pyqtSignal, Qt, QRectF, QLineF, QPointF, QTimer, QEvent
 from PyQt5.QtWidgets import QGraphicsObject, QGraphicsSceneMouseEvent, QMenu, QAction
 from PyQt5.QtGui import (QPainter, QPainterPath, QPolygonF, QPainterPathStroker, QColor,
                          QTransform, QVector2D)
-from geom_tools import mag2D, dot2D, rect_to_poly, paint_selection_shape, closest_point_on_path
+from core.geom_tools import mag2D, dot2D, rect_to_poly, paint_selection_shape, closest_point_on_path
 from math import acos, asin, atan2, pi, sin, cos, sqrt
-from control_point import ControlPoint
-import object
-from qt_tools import Pen, set_pen_style, SimpleBrush, set_pen_color, set_pen_width
+from graphics.control_point import ControlPoint
+import graphics.object
+from core.qt_tools import Pen, set_pen_style, SimpleBrush, set_pen_color, set_pen_width
 from copy import deepcopy
 #from stringcase import camelcase
-from text import Text
-from graphics_shape import GraphicsShape
-from bounded import Bounded
-from drag_droppable import DragDroppable
-from containable import Containable
-from has_context_menu import HasContextMenu
-from deletable import Deletable
-from arrow_style import ArrowStyle
-from object import Object
+from graphics.text import Text
+from graphics.graphics_shape import GraphicsShape
+from graphics.bounded import Bounded
+from graphics.drag_droppable import DragDroppable
+from graphics.containable import Containable
+from graphics.has_context_menu import HasContextMenu
+from graphics.deletable import Deletable
+from graphics.arrow_style import ArrowStyle
+from graphics.object import Object
 
 class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasContextMenu, Deletable):
     name_changed = pyqtSignal(str)
@@ -480,7 +480,7 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
         For reasons of hard-to-fix bugs, we only allow same-parent for source & target.
         """        
         dest = self.destination
-        if isinstance(item, (Arrow, object.Object, type(None))):      
+        if isinstance(item, (Arrow, Object, type(None))):      
             # ^^^ For instance you can't connect to a control point
             if dest is not None:
                 if item is not None:
@@ -497,7 +497,7 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
         For reasons of hard-to-fix bugs, we only allow same-parent for source & target.
         """
         src = self.source
-        if isinstance(item, (Arrow, object.Object, type(None))):
+        if isinstance(item, (Arrow, Object, type(None))):
             if src is not None:
                 if item is not None:
                     if src.parentItem() is item.parentItem():
@@ -516,7 +516,7 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
         if self.source_can_be(src):
             #if src is None:
                 #self.undo_setup_source()
-            if src is not self.source and isinstance(src, (Arrow, object.Object, type(None))):
+            if src is not self.source and isinstance(src, (Arrow, Object, type(None))):
                 #if self._source is not None:
                     #self.undo_setup_source()
                     #self._source.undo_setup_out_arrow(self)
@@ -535,7 +535,7 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
             #if tar is None:
                 #pass
                 #self.undo_take_image()
-            if dest is not self.destination and isinstance(dest, (Arrow, object.Object, type(None))):
+            if dest is not self.destination and isinstance(dest, (Arrow, Object, type(None))):
                 #if self.destination is not None:
                     #self.destination.undo_setup_in_arrow(self)
                 super().set_destination(dest)
@@ -658,8 +658,9 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
             self._updatePaintPath()
             self._updateSelectionPath()
             QGraphicsObject.update(self)
-        except:
-            pass
+        except Exception as e:
+            if __debug__:
+                raise e
         #if self.parentItem():
             #self.parentItem().update()
         

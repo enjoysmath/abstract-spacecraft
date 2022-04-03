@@ -1,13 +1,13 @@
-from ui_library_search_dockwidget import Ui_LibrarySearchDockWidget
+from ui.ui_library_search_dockwidget import Ui_LibrarySearchDockWidget
 from PyQt5.QtWidgets import (QDockWidget, QGridLayout, QLabel,
                              QGraphicsView)
 from PyQt5.QtCore import QRectF
-from language_canvas import LanguageCanvas
-from file_system_tree_view import FileSystemTreeView
-from library_compiler_thread import LibraryCompilerThread
+from graphics.language_canvas import LanguageCanvas
+from widget.file_system_tree_view import FileSystemTreeView
+from core.library_compiler_thread import LibraryCompilerThread
 import _pickle as pickle
-from arrow import Arrow
-from qt_tools import filter_out_descendents
+from graphics.arrow import Arrow
+from core.qt_tools import filter_out_descendents
 
 class LibrarySearchDockWidget(QDockWidget, Ui_LibrarySearchDockWidget):
     default_root_dir = 'standard_library'

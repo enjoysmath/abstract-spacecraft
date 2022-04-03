@@ -1,10 +1,10 @@
 import re
 from itertools import product
-from variable_template_regex import VariableTemplateRegex
+from core.variable_template_regex import VariableTemplateRegex
 import networkx as nx
-from arrow import Arrow
-from object import Object
-from text import Text
+from graphics.arrow import Arrow
+from graphics.object import Object
+from graphics.text import Text
 
 def regex_node_match(data1, data2):
     """

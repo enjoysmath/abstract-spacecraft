@@ -1,10 +1,10 @@
 from PyQt5.QtWidgets import QApplication, QDialog
-from mainwindow import MainWindow
-from definable import Definable
+from dialog.mainwindow import MainWindow
+from to_delete.definable import Definable
 from PyQt5.QtCore import Qt
-from set_definition_dialog import SetDefinitionDialog
-from font_dialog import FontDialog
-from text import Text
+from dialog.set_definition_dialog import SetDefinitionDialog
+from dialog.font_dialog import FontDialog
+from graphics.text import Text
 
 class App(QApplication):    
     def __init__(self, *args, **kwargs):

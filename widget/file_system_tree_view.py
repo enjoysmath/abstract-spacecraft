@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QFileSystemModel, QTreeView,QStyledItemDelegate
 from PyQt5.QtCore import QFileSystemWatcher, QModelIndex, Qt
 import os
-from checkable_file_system_model import CheckableFileSystemModel
+from core.checkable_file_system_model import CheckableFileSystemModel
 
 class FileSystemTreeView(QTreeView):
     def __init__(self, root_dir:str=None):

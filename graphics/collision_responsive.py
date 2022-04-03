@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
 from collections import OrderedDict
-from containable import Containable
-from snappable import Snappable
+from graphics.containable import Containable
+from graphics.snappable import Snappable
 
 class CollisionResponsive:
     Epsilon = 0.01
@@ -17,7 +17,7 @@ class CollisionResponsive:
         self._bboxCollisionResponse()
         
     def _bboxCollisionResponse(self):
-        from text import Text
+        from graphics.text import Text
         if not QApplication.instance().topmost_main_window().collision_response_enabled:
             return
         if not self.scene():

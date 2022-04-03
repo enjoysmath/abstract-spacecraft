@@ -1,20 +1,20 @@
 from PyQt5.QtGui import QFontMetrics, QPainter, QColor
 from PyQt5.QtWidgets import QMenu
 from PyQt5.QtCore import Qt, QPointF, QRectF, QEvent
-from connectable import Connectable
-from container import Container
-from text import Text
-from qt_tools import SimpleBrush, Pen
-from color_fillable import ColorFillable
-from collision_responsive import CollisionResponsive
-from containable import Containable
-from graphics_shape import GraphicsShape
-from bounded import Bounded
-from drag_droppable import DragDroppable
-from snappable import Snappable
-from has_context_menu import HasContextMenu
-from deletable import Deletable
-from geom_tools import closest_point_on_path
+from graphics.connectable import Connectable
+from graphics.container import Container
+from graphics.text import Text
+from core.qt_tools import SimpleBrush, Pen
+from graphics.color_fillable import ColorFillable
+from graphics.collision_responsive import CollisionResponsive
+from graphics.containable import Containable
+from graphics.graphics_shape import GraphicsShape
+from graphics.bounded import Bounded
+from graphics.drag_droppable import DragDroppable
+from graphics.snappable import Snappable
+from graphics.has_context_menu import HasContextMenu
+from graphics.deletable import Deletable
+from core.geom_tools import closest_point_on_path
 
 class Object(GraphicsShape, Bounded, Connectable, Container, CollisionResponsive, ColorFillable, \
              DragDroppable, Containable, Snappable, HasContextMenu, Deletable):

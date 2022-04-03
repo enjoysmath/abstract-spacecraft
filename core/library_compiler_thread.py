@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QThread
 import _pickle as pickle
-from networkx_tools import networkx_graph
+from core.networkx_tools import networkx_graph
 import networkx as nx
 
 class LibraryCompilerThread(QThread):

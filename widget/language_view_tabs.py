@@ -1,5 +1,5 @@
-from tab_widget import TabWidget
-from diagram_name_dialog import DiagramNameDialog
+from widget.tab_widget import TabWidget
+from dialog.diagram_name_dialog import DiagramNameDialog
 from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QMenu
 

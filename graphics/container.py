@@ -1,4 +1,4 @@
-from containable import Containable
+from graphics.containable import Containable
 from PyQt5.QtCore import QRectF
 
 class Container:

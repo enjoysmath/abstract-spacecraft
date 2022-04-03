@@ -1,15 +1,15 @@
 from PyQt5.QtWidgets import QGraphicsTextItem, QMenu, QApplication
 from PyQt5.QtGui import QTextCursor, QColor
 from PyQt5.QtCore import Qt, QPointF, QRectF, QObject
-from containable import Containable
-from collision_responsive import CollisionResponsive
-from drag_droppable import DragDroppable
-from definable import Definable
-from snappable import Snappable
-from qt_tools import unpickle_gfx_item_flags
-from deletable import Deletable
-from has_context_menu import HasContextMenu
-import container
+from graphics.containable import Containable
+from graphics.collision_responsive import CollisionResponsive
+from graphics.drag_droppable import DragDroppable
+from to_delete.definable import Definable
+from graphics.snappable import Snappable
+from core.qt_tools import unpickle_gfx_item_flags
+from graphics.deletable import Deletable
+from graphics.has_context_menu import HasContextMenu
+import graphics.container
 
 class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, Definable, 
            Snappable, HasContextMenu, Deletable):
@@ -65,7 +65,8 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
         super().update()
         parent = self.parentItem()
         
-        from arrow import Arrow        
+        from graphics.arrow import Arrow    
+        
         if parent:
             if isinstance(parent, Arrow):
                 if parent.parentItem():

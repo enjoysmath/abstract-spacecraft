@@ -1,12 +1,12 @@
 from PyQt5.QtWidgets import QGraphicsView
 from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtCore import Qt
-from language_canvas import LanguageCanvas
-from object import Object
-from arrow import Arrow
+from graphics.language_canvas import LanguageCanvas
+from graphics.object import Object
+from graphics.arrow import Arrow
 from bidict import bidict
-from text import Text
-from connectable import Connectable
+from graphics.text import Text
+from graphics.connectable import Connectable
 
 class LanguageView(QGraphicsView):
     def __init__(self, canvas:LanguageCanvas):
@@ -81,9 +81,9 @@ class LanguageView(QGraphicsView):
         self._scale = (s[0]*sx, s[1]*sy)        
 
     def zoom_100(self):
-        import geom_tools
+        from core.geom_tools import extract_transform_scale
         transform = self.transform()
-        sx, sy = geom_tools.extract_transform_scale(transform)
+        sx, sy = extract_transform_scale(transform)
         self.setTransform(transform.scale(1.0/sx, 1.0/sy).scale(self._scale[0], self._scale[1]))    
         #IDK why this works...
         self.scale(1.0/self._scale[0], 1.0/self._scale[1])

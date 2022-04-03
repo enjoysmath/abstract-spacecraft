@@ -3,7 +3,7 @@ from PyQt5.QtGui import (QPolygonF, QMatrix4x4, QMatrix3x3, QTransform, QPen,
                          QPainterPath, QVector2D)
 from PyQt5.QtCore import QLineF, QPointF, QRectF, Qt
 from cmath import exp, phase
-from qt_tools import simple_max_contrasting_color, Pen
+from core.qt_tools import simple_max_contrasting_color, Pen
 import sys
 # Geometric Transformations
 

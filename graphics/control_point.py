@@ -1,12 +1,12 @@
 from PyQt5.QtCore import QPointF, Qt, QRectF, pyqtSignal
-from qt_tools import Pen, SimpleBrush, set_pen_alpha, set_brush_alpha
-from geom_tools import mag2D, closest_point_on_path, paint_selection_shape
+from core.qt_tools import Pen, SimpleBrush, set_pen_alpha, set_brush_alpha
+from core.geom_tools import mag2D, closest_point_on_path, paint_selection_shape
 from copy import deepcopy
 from PyQt5.QtWidgets import QGraphicsObject
 from PyQt5.QtGui import QPainterPath, QColor
-from graphics_shape import GraphicsShape
-from color_fillable import ColorFillable
-from bounded import Bounded
+from graphics.graphics_shape import GraphicsShape
+from graphics.color_fillable import ColorFillable
+from graphics.bounded import Bounded
 
 class ControlPoint(GraphicsShape, ColorFillable, Bounded):
     default_fill_color = QColor(255,180,10,150)

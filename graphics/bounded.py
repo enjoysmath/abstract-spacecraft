@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QVector2D
 from PyQt5.QtCore import QPointF
-from geom_tools import closest_point_on_path
+from core.geom_tools import closest_point_on_path
 #import arrow
 
 class Bounded:
@@ -9,8 +9,8 @@ class Bounded:
     
     def _closest_boundary_pos_to(self, item, shape=None, item_shape=None, rad0=0, rad1=0):
         if shape is None:
-            import arrow
-            if isinstance(self, arrow.Arrow):
+            from graphics.arrow import Arrow
+            if isinstance(self, Arrow):
                 shape = self._linePath
             else:
                 shape = self.paint_shape()

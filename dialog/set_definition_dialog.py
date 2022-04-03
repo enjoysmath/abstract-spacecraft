@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QDialog
-from ui_set_definition_dialog import Ui_SetDefinitionDialog
+from ui.ui_set_definition_dialog import Ui_SetDefinitionDialog
 from PyQt5.QtCore import Qt
 
 class SetDefinitionDialog(QDialog, Ui_SetDefinitionDialog):  

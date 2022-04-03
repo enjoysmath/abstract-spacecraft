@@ -2,20 +2,20 @@ from PyQt5.QtWidgets import QGraphicsScene, QUndoStack, QApplication, QMenu
 from PyQt5.QtGui import QColor, QPainter, QPen, QTransform, QDrag
 from PyQt5.QtCore import QPointF, Qt, QMimeData, pyqtSignal
 from functools import cmp_to_key
-from text import Text
-from object import Object
-from collision_responsive import CollisionResponsive
+from graphics.text import Text
+from graphics.object import Object
+from graphics.collision_responsive import CollisionResponsive
 import _pickle as pickle
-from arrow import Arrow
-from qt_tools import (SimpleBrush, Pen, filter_out_descendents, first_ancestor_of_type, \
+from graphics.arrow import Arrow
+from core.qt_tools import (SimpleBrush, Pen, filter_out_descendents, first_ancestor_of_type, \
                       simple_max_contrasting_color)
-from container import Container
-from connectable import Connectable
-from control_point import ControlPoint
-from canvas_grid_dialog import CanvasGridDialog
-from graphics_shape import GraphicsShape
-from deletable import Deletable
-from color_dialog import ColorDialog
+from graphics.container import Container
+from graphics.connectable import Connectable
+from graphics.control_point import ControlPoint
+from dialog.canvas_grid_dialog import CanvasGridDialog
+from graphics.graphics_shape import GraphicsShape
+from graphics.deletable import Deletable
+from dialog.color_dialog import ColorDialog
 
 class LanguageCanvas(QGraphicsScene):
     mouse_pressed = pyqtSignal(QPointF)
@@ -132,11 +132,11 @@ class LanguageCanvas(QGraphicsScene):
                 f.update() 
                         
     def _addObject(self, X:Object, parent=None):
-        from undo_cmd import AddObject
+        from core.undo_cmd import AddObject
         self._undoStack.push(AddObject(X, canvas=self, parent=parent))
         
     def _addArrow(self, f:Arrow, parent=None):
-        from undo_cmd import AddArrow
+        from core.undo_cmd import AddArrow
         self._undoStack.push(AddArrow(f, canvas=self, parent=parent))
             
     def undo_command(self):
@@ -228,7 +228,7 @@ class LanguageCanvas(QGraphicsScene):
                 self.end_placing_control_point()
             QApplication.instance().topmost_main_window().set_collision_response_enabled(self._collisionResponseSave)
         elif self._movedItems:
-            from undo_cmd import MoveItems
+            from core.undo_cmd import MoveItems
             for item in self._movedItems.values():
                 item.update()
             self._undoStack.push(MoveItems(self._movedItems.values(), event.scenePos() - self._startPos))
@@ -374,7 +374,7 @@ class LanguageCanvas(QGraphicsScene):
             painter.setRenderHints(QPainter.Antialiasing)
             gridx = int(self.grid_sizex() + 0.5)
             gridy = int(self.grid_sizey() + 0.5)
-            w = 0.04 * (gridx + gridy) / 2
+            w = 0.02 * (gridx + gridy) / 2
             painter.setPen(QPen(simple_max_contrasting_color(self.backgroundBrush().color()), w))
             points = []                 # Adding to a list and then drawing is much faster
             o = self.grid_origin()
