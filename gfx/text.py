@@ -1,15 +1,15 @@
 from PyQt5.QtWidgets import QGraphicsTextItem, QMenu, QApplication
 from PyQt5.QtGui import QTextCursor, QColor
 from PyQt5.QtCore import Qt, QPointF, QRectF, QObject
-from containable import Containable
-from collision_responsive import CollisionResponsive
-from drag_droppable import DragDroppable
-from definable import Definable
-from snappable import Snappable
-from qt_tools import unpickle_gfx_item_flags
-from deletable import Deletable
-from has_context_menu import HasContextMenu
-import container
+from gfx.containable import Containable
+from gfx.collision_responsive import CollisionResponsive
+from gfx.drag_droppable import DragDroppable
+from gfx.definable import Definable
+from gfx.snappable import Snappable
+from core.qt_tools import unpickle_gfx_item_flags
+from gfx.deletable import Deletable
+from gfx.has_context_menu import HasContextMenu
+import gfx.container
 
 class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, Definable, 
            Snappable, HasContextMenu, Deletable):

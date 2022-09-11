@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QFont
-from app import App
+from core.app import App
 import sys
-from mainwindow import MainWindow
+from dialog.mainwindow import MainWindow
 
 if __name__ == '__main__':
     app = App([])

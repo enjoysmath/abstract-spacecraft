@@ -1,12 +1,12 @@
 from PyQt5.QtWidgets import QGraphicsView
 from PyQt5.QtGui import QGuiApplication, QTransform
 from PyQt5.QtCore import Qt, QPointF
-from language_canvas import LanguageCanvas
-from object import Object
-from arrow import Arrow
+from gfx.language_canvas import LanguageCanvas
+from gfx.object import Object
+from gfx.arrow import Arrow
 from bidict import bidict
-from text import Text
-from connectable import Connectable
+from gfx.text import Text
+from gfx.connectable import Connectable
 
 class LanguageView(QGraphicsView):
     def __init__(self, canvas:LanguageCanvas):

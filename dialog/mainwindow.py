@@ -1,17 +1,17 @@
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QFileDialog, \
                              QGridLayout, QWidget)
-from ui_mainwindow import Ui_MainWindow
-from language_view_tabs import LanguageViewTabs
-from language_view import LanguageView, LanguageCanvas
-from text import Text
+from ui.ui_mainwindow import Ui_MainWindow
+from widget.language_view_tabs import LanguageViewTabs
+from gfx.language_view import LanguageView, LanguageCanvas
+from gfx.text import Text
 from PyQt5.QtCore import Qt, QRectF, QTimer
-from edit_text_dockwidget import EditTextDockWidget
-from library_search_dockwidget import LibrarySearchDockWidget
+from widget.edit_text_dockwidget import EditTextDockWidget
+from widget.library_search_dockwidget import LibrarySearchDockWidget
 import _pickle as pickle
-from debug_widget import DebugWidget
-from object import Object
-from arrow import Arrow
-from text import Text
+from widget.debug_widget import DebugWidget
+from gfx.object import Object
+from gfx.arrow import Arrow
+from gfx.text import Text
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     new_tab_base_name = '🌌'

@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
 from collections import OrderedDict
-from containable import Containable
-from snappable import Snappable
+from gfx.containable import Containable
+from gfx.snappable import Snappable
 
 class CollisionResponsive:
     Epsilon = 0.01

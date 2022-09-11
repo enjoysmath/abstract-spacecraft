@@ -2,12 +2,12 @@ from PyQt5.QtWidgets import QGraphicsScene, QUndoStack, QApplication, QMenu
 from PyQt5.QtGui import QColor, QPainter, QPen, QTransform, QDrag
 from PyQt5.QtCore import QPointF, Qt, QMimeData, pyqtSignal
 from functools import cmp_to_key
-from text import Text
-from object import Object
-from collision_responsive import CollisionResponsive
+from gfx.text import Text
+from gfx.object import Object
+from gfx.collision_responsive import CollisionResponsive
 import _pickle as pickle
-from arrow import Arrow
-from qt_tools import (SimpleBrush, Pen, filter_out_descendents, first_ancestor_of_type, \
+from gfx.arrow import Arrow
+from core.qt_tools import (SimpleBrush, Pen, filter_out_descendents, first_ancestor_of_type, \
                       simple_max_contrasting_color)
 from container import Container
 from connectable import Connectable
