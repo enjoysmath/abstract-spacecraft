@@ -135,3 +135,6 @@ dmypy.json
 /*.exe
 /library_search/x64/Debug
 /release
+FileContentIndex
+v17
+3rdparty
