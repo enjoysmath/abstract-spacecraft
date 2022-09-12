@@ -291,7 +291,7 @@ class LanguageCanvas(QGraphicsScene):
             self.delete_items(items)
             
     def delete_items(self, items):
-        from undo_cmd import DeleteItems
+        from core.undo_cmd import DeleteItems
         self._undoStack.push(DeleteItems(items, canvas=self))
             
     def done_editing_text(self):

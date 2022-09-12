@@ -34,7 +34,7 @@ text_to_line_style = bidict({
 
 class ArrowStyle(QObject):
     update_requested = pyqtSignal()     
-    #bezier_toggled = pyqtSignal(bool)
+    bezier_toggled = pyqtSignal(bool)
 
     MaxNumLines = 3
     MaxNumHeads = 6
@@ -388,7 +388,8 @@ class ArrowStyle(QObject):
 
     def set_bezier(self, bezier:bool=True):
         if self._isBezier != bezier:
-            self._isBezier = bezier
+            self.bezier_toggled.emit(bezier)
+            self._isBezier = bezier   
             self.update_requested.emit()    
 
     @property

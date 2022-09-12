@@ -7,7 +7,7 @@
   },
   {
    "optionDest": "filenames",
-   "value": "C:/Users/FruitfulApproach/Desktop/AbstractSpacecraft/abstract-spacecraft/abstract_spacecraft.py"
+   "value": "C:/Users/fruit/OneDrive/Desktop/abstract-spacecraft/abstract_spacecraft.py"
   },
   {
    "optionDest": "onefile",
@@ -19,7 +19,7 @@
   },
   {
    "optionDest": "icon_file",
-   "value": "C:/Users/FruitfulApproach/Desktop/AbstractSpacecraft/abstract-spacecraft/img/galaxy.ico"
+   "value": "C:/Users/fruit/OneDrive/Desktop/abstract-spacecraft/img/galaxy.ico"
   },
   {
    "optionDest": "name",
@@ -39,6 +39,14 @@
   },
   {
    "optionDest": "noupx",
+   "value": true
+  },
+  {
+   "optionDest": "disable_windowed_traceback",
+   "value": false
+  },
+  {
+   "optionDest": "embed_manifest",
    "value": true
   },
   {
@@ -62,16 +70,20 @@
    "value": false
   },
   {
-   "optionDest": "datas",
-   "value": "C:/Users/FruitfulApproach/Desktop/AbstractSpacecraft/abstract-spacecraft/standard_library;standard_library/"
+   "optionDest": "argv_emulation",
+   "value": false
   },
   {
    "optionDest": "datas",
-   "value": "C:/Users/FruitfulApproach/Desktop/AbstractSpacecraft/abstract-spacecraft/standard_library/test.\ud83c\udf0c;."
+   "value": "C:/Users/fruit/OneDrive/Desktop/abstract-spacecraft/standard_library;standard_library/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/fruit/OneDrive/Desktop/abstract-spacecraft/standard_library/test.\ud83c\udf0c;."
   },
   {
    "optionDest": "resources",
-   "value": "C:/Users/FruitfulApproach/Desktop/AbstractSpacecraft/abstract-spacecraft/resources.qrc"
+   "value": "C:/Users/fruit/OneDrive/Desktop/abstract-spacecraft/resources.qrc"
   }
  ],
  "nonPyinstallerOptions": {

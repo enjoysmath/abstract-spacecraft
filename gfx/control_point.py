@@ -86,8 +86,9 @@ class ControlPoint(GraphicsShape, ColorFillable, Bounded):
         self._updateSelectionPath()
         #self._updateRect()
         self._updateBoundingRect()
-        if self.parentItem():
-            self.parentItem().update()
+        parent = self.parentItem()
+        if parent and parent.is_initialized:
+            parent.update()
         
     def radius(self):
         return self._shapePad

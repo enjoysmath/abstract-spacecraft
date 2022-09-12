@@ -173,7 +173,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
         
     def use_another_drag_item(self):
         if self.parentItem() is not None:
-            if isinstance(self.parentItem(), container.Container) and self.parentItem().count_children_of_type(QObject) == 1:
+            if isinstance(self.parentItem(), gfx.container.Container) and self.parentItem().count_children_of_type(QObject) == 1:
                 return self.parentItem()
         return self
     

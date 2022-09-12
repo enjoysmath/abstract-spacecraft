@@ -44,10 +44,11 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
     default_dotted_line = False
     default_relative_head_size = 5.0
     intersect_shape_width_multiple = 10.0    
-    relative_control_point_size = 0.2
+    relative_control_point_size = 0.83
     control_point_edit_time = 2500
     
     def __init__(self, text:str=None, ctrl_points=None):
+        self.is_initialized = False
         GraphicsShape.__init__(self)
         Connector.__init__(self)
         Bounded.__init__(self)
@@ -96,12 +97,15 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
         self._penColorDialog.currentColorChanged.connect(self.set_default_pen_color)
         pen = set_pen_width(pen, self.default_line_width)
         self._pen = pen
+        for point in self._points:
+            point.set_radius(self.relative_control_point_size * pen.widthF())        
         self.update_centroid_position()
         self._lastLabelPosLine = None 
         self.arrow_style = ArrowStyle()
         self.arrow_style.update_requested.connect(self.update)
+        self.arrow_style.bezier_toggled.connect(self._toggleBezierControlPoints)
         self.update()
-        self._init = True
+        self.is_initialized:bool = True
                         
     def __setstate__(self, data):
         self.__init__(ctrl_points=data['points'])
@@ -216,20 +220,27 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
         elif point is self.destination_point:
             return self.destination
             
-    def _popupBezier(self, point, at_item):
+    def _popupBezier(self, point):
         if not self.is_bezier:
-            self.toggle_bezier(True)
-            pos = at_item.closest_boundary_pos_to(point)
-            pos = self.mapFromItem(at_item, pos)
-            center = at_item.pos()
+            assert self.source == self.destination
+            self.arrow_style.set_bezier()
+            pos = self.source.mapToScene(self.source.closest_boundary_pos_to(point))
+            pos = self.mapFromScene(pos)
+            center = self.mapFromScene(self.source.scenePos())
             v = pos - center
-            v *= 3.0
             perp = QPointF(-v.y(), v.x())
-            v += center
-            a = v + perp
-            b = v - perp 
+            u = v + center
+            a = u + perp
+            b = u - perp 
+            item_shape = self.source.paint_shape()
+            a = closest_point_on_path(a, self.mapFromItem(self.source, item_shape))
+            b = closest_point_on_path(b, self.mapFromItem(self.source, item_shape))
             self._points[0].setPos(a)
             self._points[-1].setPos(b)
+            a += 2*v + perp
+            b += 2*v - perp
+            self._points[1].setPos(a)
+            self._points[-2].setPos(b)
            
     @property
     def source_or_point(self):
@@ -289,13 +300,14 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
         for k in range(0, len(self._points)):
             self._points[k].setPos(pos0 + k*u)
         
-    def toggle_bezier(self, toggled):
-        if toggled != self.is_bezier:
-            self._bezier = toggled
-            self._points[1].setVisible(toggled)
-            self._points[2].setVisible(toggled)
-            self.bezier_toggled.emit(toggled)
-            self.set_line_points(self._points[0].pos(), self._points[-1].pos())
+    def _toggleBezierControlPoints(self, toggled):
+        # Do not call this directly.  Only as a callback for ArrowStyle.  TODO
+        # Use instead an accesor method to toggle the bezier style through our arrow_style member, or create one if it doesn't exist. :)
+        self._bezier = toggled
+        self._points[1].setVisible(toggled)
+        self._points[2].setVisible(toggled)
+        self.bezier_toggled.emit(toggled)
+        self.set_line_points(self._points[0].pos(), self._points[-1].pos())
 
     @property            
     def line(self):
@@ -334,7 +346,7 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
                 b = self.mapFromItem(dest, b)
             else:
                 return
-
+                
             if self.destination is not None:
                 self.destination_point.setPos(b) 
             if self.source is not None:
@@ -535,8 +547,8 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
                 super().set_source(src)
                 #if src is not None:
                     #src.setup_out_arrow(self)
-                if src is self.destination and src is not None:
-                    self._popupBezier(self.source_point, src)
+                if src and src is self.destination:
+                    self._popupBezier(self.source_point)
                 self.update()
             if src:
                 p = src.parentItem()
@@ -553,8 +565,8 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
                 super().set_destination(dest)
                 #if tar is not None:
                     #tar.setup_in_arrow(self)
-                if dest is self.source and dest is not None:
-                    self._popupBezier(self.destination_point, dest)
+                if dest and dest and dest is self.source:
+                    self._popupBezier(self.destination_point)
                 self.update()          
             if dest:
                 p = dest.parentItem()
@@ -670,8 +682,8 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
             self._updatePaintPath()
             self._updateSelectionPath()
             QGraphicsObject.update(self)
-        except:
-            pass
+        except Exception as excep:
+            raise excep
         #if self.parentItem():
             #self.parentItem().update()
         
