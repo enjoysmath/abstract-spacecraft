@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QDialog
-from ui_combo_box_dialog import Ui_ComboBoxDialog
+from ui.ui_combo_box_dialog import Ui_ComboBoxDialog
 
 class ComboBoxDialog(QDialog, Ui_ComboBoxDialog):
     def __init__(self):

@@ -14,7 +14,7 @@
    <string>Abstract Spacecraft v0.0</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset resource="../resources.qrc">
     <normaloff>:/img/galaxy.ico</normaloff>:/img/galaxy.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget"/>
@@ -29,7 +29,7 @@
    </property>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
@@ -46,7 +46,7 @@
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
-     <string>Options</string>
+     <string>&amp;Options</string>
     </property>
     <addaction name="actionApplication_font"/>
     <addaction name="actionCollision_response"/>
@@ -54,10 +54,10 @@
    </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
-     <string>🛸</string>
+     <string>&amp;File</string>
     </property>
-    <addaction name="actionNew_Window"/>
-    <addaction name="actionNew_Tab"/>
+    <addaction name="actionNewProof"/>
+    <addaction name="actionNewFreeDrawing"/>
     <addaction name="separator"/>
     <addaction name="actionLoad_diagram"/>
     <addaction name="separator"/>
@@ -72,10 +72,16 @@
     </property>
     <addaction name="actionGraphics_Debugger"/>
    </widget>
+   <widget class="QMenu" name="menu_Export">
+    <property name="title">
+     <string>&amp;Export</string>
+    </property>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuOptions"/>
+   <addaction name="menu_Export"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -158,17 +164,17 @@
     <string>Ctrl+0</string>
    </property>
   </action>
-  <action name="actionNew_Window">
+  <action name="actionNewProof">
    <property name="text">
-    <string>New spacecraft</string>
+    <string>New Proof</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionNew_Tab">
+  <action name="actionNewFreeDrawing">
    <property name="text">
-    <string>New diagram</string>
+    <string>New Free Drawing</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
@@ -176,7 +182,7 @@
   </action>
   <action name="actionBack">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/img/navigate_back.ico</normaloff>:/img/navigate_back.ico</iconset>
    </property>
    <property name="text">
@@ -221,7 +227,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/img/arrow.ico</normaloff>:/img/arrow.ico</iconset>
    </property>
    <property name="text">
@@ -242,7 +248,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/img/letter_T.png</normaloff>:/img/letter_T.png</iconset>
    </property>
    <property name="text">
@@ -271,7 +277,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/img/book_lookup.png</normaloff>:/img/book_lookup.png</iconset>
    </property>
    <property name="text">
@@ -286,7 +292,7 @@
   </action>
   <action name="actionSave_Diagram">
    <property name="text">
-    <string>Save diagram</string>
+    <string>Save</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -294,15 +300,12 @@
   </action>
   <action name="actionSave_diagram_as">
    <property name="text">
-    <string>Save diagram as...</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
+    <string>Save as...</string>
    </property>
   </action>
   <action name="actionLoad_diagram">
    <property name="text">
-    <string>Open diagram...</string>
+    <string>Open...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -322,6 +325,10 @@
   <action name="actionGraphics_Debugger">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/img/galaxy.ico</normaloff>:/img/galaxy.ico</iconset>
    </property>
    <property name="text">
     <string>Graphics Debugger</string>
@@ -351,7 +358,7 @@
   </action>
   <action name="actionFunctor">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../resources.qrc">
      <normaloff>:/img/functor_of_dot.png</normaloff>:/img/functor_of_dot.png</iconset>
    </property>
    <property name="text">
@@ -366,7 +373,7 @@
   </action>
   <action name="blankSpace">
    <property name="text">
-    <string>   </string>
+    <string/>
    </property>
   </action>
   <action name="blankSpace_2">
@@ -376,7 +383,7 @@
   </action>
  </widget>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resources.qrc"/>
  </resources>
  <connections/>
 </ui>
