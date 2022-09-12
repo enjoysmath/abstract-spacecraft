@@ -34,12 +34,16 @@
    "value": false
   },
   {
+   "optionDest": "debug",
+   "value": "imports"
+  },
+  {
    "optionDest": "strip",
-   "value": true
+   "value": false
   },
   {
    "optionDest": "noupx",
-   "value": true
+   "value": false
   },
   {
    "optionDest": "disable_windowed_traceback",
@@ -74,12 +78,16 @@
    "value": false
   },
   {
-   "optionDest": "datas",
-   "value": "C:/Users/fruit/OneDrive/Desktop/abstract-spacecraft/standard_library;standard_library/"
+   "optionDest": "hiddenimports",
+   "value": "PyQt5"
+  },
+  {
+   "optionDest": "hiddenimports",
+   "value": "sip"
   },
   {
    "optionDest": "datas",
-   "value": "C:/Users/fruit/OneDrive/Desktop/abstract-spacecraft/standard_library/test.\ud83c\udf0c;."
+   "value": "C:/Users/fruit/OneDrive/Desktop/abstract-spacecraft/standard_library;standard_library/"
   },
   {
    "optionDest": "resources",
