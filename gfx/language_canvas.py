@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QGraphicsScene, QUndoStack, QApplication, QMenu
 from PyQt5.QtGui import QColor, QPainter, QPen, QTransform, QDrag
-from PyQt5.QtCore import QPointF, Qt, QMimeData, pyqtSignal
+from PyQt5.QtCore import QPointF, Qt, QMimeData, pyqtSignal #QElapsedTimer
 from functools import cmp_to_key
 from gfx.text import Text
 from gfx.object import Object
@@ -24,6 +24,7 @@ class LanguageCanvas(QGraphicsScene):
     init_arrow_text = '🚀'
     init_remark_text = "Remark"
     default_background_color = QColor(237, 255, 241)
+    #double_click_timeout_ms = 200
     
     def __init__(self):
         super().__init__()
@@ -42,7 +43,8 @@ class LanguageCanvas(QGraphicsScene):
         self.background_color_dialog = ColorDialog(title='Background color')
         self.background_color_dialog.currentColorChanged.connect(lambda col: self.setBackgroundBrush(SimpleBrush(col)))
         self.background_color_dialog.setCurrentColor(self.backgroundBrush().color())
-                
+        #self._doubleClickTimer = None
+
     def __setstate__(self, data:dict):
         self.__init__()
         self.setBackgroundBrush(data['background brush'])
@@ -77,7 +79,7 @@ class LanguageCanvas(QGraphicsScene):
     def backgroundBrush(self):
         return self._backgroundBrush
 
-    def mouseDoubleClickEvent(self, event):
+    def mouseDoubleClickEvent(self, event):        
         item = self.itemAt(event.scenePos(), QTransform())
         window = QApplication.activeWindow()
         if not window.place_arrow_mode:
@@ -172,6 +174,16 @@ class LanguageCanvas(QGraphicsScene):
             super().mouseMoveEvent(event)
         
     def mousePressEvent(self, event):
+        #if self._doubleClickTimer is None:
+            #self._doubleClickTimer = QElapsedTimer()
+            #self._doubleClickTimer.start()
+            #return
+        #elif not self._doubleClickTimer.hasExpired(self.double_click_timeout_ms):
+            #return
+        
+        #if event.button() != Qt.RightButton:
+            #return
+            
         self.mouse_pressed.emit(event.scenePos())        
         item = self.itemAt(event.scenePos(), QTransform())      
         superCall = True
@@ -203,13 +215,21 @@ class LanguageCanvas(QGraphicsScene):
                                                 if id(arrow.source) in itemsToMove and id(arrow.destination) in itemsToMove:
                                                     self._movedItems[id(arrow)] = arrow
                                     elif isinstance(item, Text):
-                                        if item.flags() & item.ItemIsMovable:
-                                            self._movedItems[id(item)] = item
-                                                    
-                                self._movedItems = {id(item) : item for item in filter_out_descendents(self._movedItems.values()) }
-                                                                                         
+                                        parent = item.parentItem()
+                                        
+                                        if isinstance(parent, Object):
+                                            self._movedItems[id(parent)] = parent
+                                        
+                                        elif item.flags() & item.ItemIsMovable:
+                                            self._movedItems[id(item)] = item   
+                                    
+                                self._movedItems = {id(item) : item for item in filter_out_descendents(self._movedItems.values()) }       
                             else:
-                                self._movedItems = {id(item) : item}
+                                if isinstance(item, Text):
+                                    parent = item.parentItem()
+                                    if isinstance(parent, Object):
+                                        item = parent
+                                self._movedItems = {id(item) : item}                            
                     else:
                         self.connect_arrow_by_control_point(self.items(event.scenePos()))
         elif event.button() == Qt.RightButton and \
@@ -226,6 +246,8 @@ class LanguageCanvas(QGraphicsScene):
             
         if superCall:
             super().mousePressEvent(event)
+            
+        #self._doubleClickTimer = None        
         
     #TODO: deleting an item must update each UndoCmd with items
     
@@ -241,11 +263,13 @@ class LanguageCanvas(QGraphicsScene):
             QApplication.instance().topmost_main_window().set_collision_response_enabled(self._collisionResponseSave)
         elif self._movedItems:
             from core.undo_cmd import MoveItems
-            for item in self._movedItems.values():
-                item.update()
+            move_items = list(self._movedItems.values())
+            self._movedItems.clear()    # BUGFIX: clearing moved items must come before updating, or the arrows won't update properly sometimes after snapping
+            for item in move_items:
+                if isinstance(item, Object):   # BUGFIX: remember to snap then update arrows here.
+                    item.setPos(item.pos(), snap=True, update=True)           
             self._undoStack.push(MoveItems(self._movedItems.values(), event.scenePos() - self._startPos))
             self._startPos = None
-            self._movedItems = {}
         super().mouseReleaseEvent(event)
         
     def start_drag_items(self, item, event):        

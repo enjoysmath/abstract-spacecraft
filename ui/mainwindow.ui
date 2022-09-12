@@ -58,13 +58,15 @@
     </property>
     <addaction name="actionNewProof"/>
     <addaction name="actionNewFreeDrawing"/>
+    <addaction name="actionNewWindow"/>
     <addaction name="separator"/>
-    <addaction name="actionLoad_diagram"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSaveAs"/>
     <addaction name="separator"/>
-    <addaction name="actionSave_Diagram"/>
-    <addaction name="actionSave_diagram_as"/>
-    <addaction name="separator"/>
-    <addaction name="actionClose_Diagram"/>
+    <addaction name="actionDelete_Tab"/>
+    <addaction name="actionCloseWindow"/>
+    <addaction name="actionCloseEntireApp"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -113,6 +115,7 @@
    <addaction name="actionBook_Lookup"/>
    <addaction name="actionEdit_Text"/>
    <addaction name="actionPlace_Arrow"/>
+   <addaction name="actionMoveStuffMode"/>
    <addaction name="blankSpace"/>
    <addaction name="actionFunctor"/>
   </widget>
@@ -245,7 +248,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
@@ -290,7 +293,7 @@
     <string>Alt+L</string>
    </property>
   </action>
-  <action name="actionSave_Diagram">
+  <action name="actionSave">
    <property name="text">
     <string>Save</string>
    </property>
@@ -298,12 +301,12 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionSave_diagram_as">
+  <action name="actionSaveAs">
    <property name="text">
     <string>Save as...</string>
    </property>
   </action>
-  <action name="actionLoad_diagram">
+  <action name="actionOpen">
    <property name="text">
     <string>Open...</string>
    </property>
@@ -379,6 +382,41 @@
   <action name="blankSpace_2">
    <property name="text">
     <string/>
+   </property>
+  </action>
+  <action name="actionMoveStuffMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/img/move_crosshairs.ico</normaloff>:/img/move_crosshairs.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Move Stuff</string>
+   </property>
+   <property name="toolTip">
+    <string>Move stuff in the scene easily.</string>
+   </property>
+  </action>
+  <action name="actionNewWindow">
+   <property name="text">
+    <string>New Window</string>
+   </property>
+  </action>
+  <action name="actionCloseWindow">
+   <property name="text">
+    <string>Close Window</string>
+   </property>
+  </action>
+  <action name="actionDelete_Tab">
+   <property name="text">
+    <string>Delete Tab</string>
+   </property>
+  </action>
+  <action name="actionCloseEntireApp">
+   <property name="text">
+    <string>Close Entire App</string>
    </property>
   </action>
  </widget>

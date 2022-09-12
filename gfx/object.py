@@ -176,9 +176,11 @@ class Object(GraphicsShape, Bounded, Connectable, Container, CollisionResponsive
     def setPos(self, pos:QPointF, snap:bool=False, update:bool=False):
         if snap:
             pos = self.snap_to_grid_pos(pos)
+        # BUGFIX: call super setPos first or update_connectors will update with incorrect position        
+        super().setPos(pos)
         if update:
             self.update_connectors()            
-        super().setPos(pos)
+        
         
     #def sceneEventFilter(self, watched, event):
         #if isinstance(watched, Text):

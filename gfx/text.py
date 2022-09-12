@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QGraphicsTextItem, QMenu, QApplication
 from PyQt5.QtGui import QTextCursor, QColor
-from PyQt5.QtCore import Qt, QPointF, QRectF, QObject
+from PyQt5.QtCore import Qt, QPointF, QRectF, QObject #QElapsedTimer
 from gfx.containable import Containable
 from gfx.collision_responsive import CollisionResponsive
 from gfx.drag_droppable import DragDroppable
@@ -28,7 +28,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
         self._html = None
         if html is not None:            
             self.setHtml(html)
-        self.setFlags(self.ItemIsFocusable | self.ItemIsMovable | self.ItemSendsGeometryChanges | self.ItemIsSelectable)
+        self.setFlags(self.ItemIsFocusable | self.ItemSendsGeometryChanges | self.ItemIsSelectable)
         self.setTextInteractionFlags(self.default_interaction)
         self.setOpenExternalLinks(True)
         self._bbox = super().boundingRect()
@@ -36,6 +36,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
         self.setFont(QApplication.instance().font())
         self._center = self._bbox.center()
         self._restorePos = None
+        #self._doubleClickTimer = None
         
     def __setstate__(self, data:dict):
         self.__init__(data['html'])
@@ -64,15 +65,15 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
             self.bbox_collision_response()
         Containable.update(self)
         super().update()
-        parent = self.parentItem()
+        #parent = self.parentItem()
         
-        from gfx.arrow import Arrow        
-        if parent:
-            if isinstance(parent, Arrow):
-                if parent.parentItem():
-                    parent.parentItem().update()
-            else:
-                self.parentItem().update()        
+        #from gfx.arrow import Arrow        
+        #if parent:
+            #if isinstance(parent, Arrow):
+                #if parent.parentItem():
+                    #parent.parentItem().update()
+            #else:
+                #self.parentItem().update()        
         
     def mouseDoubleClickEvent(self, event):
         if self.scene():       
@@ -92,10 +93,18 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
         super().keyPressEvent(event)
         
     def mousePressEvent(self, event):
+        #if self._doubleClickTimer is None:
+            #self._doubleClickTimer = QElapsedTimer()
+            #self._doubleClickTimer.start()
+            #return
+        #elif not self._doubleClickTimer.hasExpired(self.scene().double_click_timeout_ms):
+            #return
+         
         from gfx.object import Object
         if self._restorePos is None and isinstance(self.parentItem(), Object):
             self._restorePos = self.pos()
         super().mousePressEvent(event)
+            #self._doubleClickTimer = None
         
     def mouseReleaseEvent(self, event):
         from gfx.object import Object

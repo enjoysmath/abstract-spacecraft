@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file>img/move_crosshairs.ico</file>
     <file>img/functor_of_dot.png</file>
     <file>img/functor_of_dot.ico</file>
     <file>img/galaxy.ico</file>

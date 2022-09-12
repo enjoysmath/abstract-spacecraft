@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QFileDialog, \
-                             QGridLayout, QWidget)
+                             QGridLayout, QWidget, QActionGroup)
 from ui.ui_mainwindow import Ui_MainWindow
 from widget.language_view_tabs import LanguageViewTabs
 from gfx.language_view import LanguageView, LanguageCanvas
@@ -60,6 +60,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._setQueryTimer.setSingleShot(True)        
         self._setQueryTimer.timeout.connect(self._setSelectedItemsAsQuery)
         self._setQueryView = None
+        self._cassetteButtonGroup = QActionGroup(self)
+        self._cassetteButtonGroup.addAction(self.actionMoveStuffMode)
+        self._cassetteButtonGroup.addAction(self.actionPlace_Arrow)
+        self._cassetteButtonGroup.addAction(self.actionEdit_Text)
+        self._cassetteButtonGroup.addAction(self.actionBook_Lookup)
+        self._cassetteButtonGroup.setExclusive(True)
         
     def __setstate__(self, data):
         self.__init__()
