@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget
 from ui.ui_edit_text_widget import Ui_EditTextWidget
 
-class EditTextWidget(QWidget, Ui_EditTextWidget):
+class _EditTextWidget(QWidget, Ui_EditTextWidget):
     def __init__(self, type):
         QWidget.__init__(self)
         Ui_EditTextWidget.__init__(self)

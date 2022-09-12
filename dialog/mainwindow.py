@@ -5,7 +5,7 @@ from widget.language_view_tabs import LanguageViewTabs
 from gfx.language_view import LanguageView, LanguageCanvas
 from gfx.text import Text
 from PyQt5.QtCore import Qt, QRectF, QTimer
-from widget.edit_text_dockwidget import EditTextDockWidget
+#from widget.edit_text_dockwidget import EditTextDockWidget
 from widget.library_search_dockwidget import LibrarySearchDockWidget
 import _pickle as pickle
 from widget.debug_widget import DebugWidget
@@ -38,13 +38,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionBack.triggered.connect(lambda b: self.navigate_back())
         self.actionForward.triggered.connect(lambda b: self.navigate_forward())
         self.language_tabs.currentChanged.connect(self.language_view_tab_changed)
-        self.edit_text_dock = EditTextDockWidget()
+        #self.edit_text_dock = EditTextDockWidget()
         self.library_search_dock = LibrarySearchDockWidget()
         self.addDockWidget(Qt.RightDockWidgetArea, self.library_search_dock)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.edit_text_dock)
-        self.tabifyDockWidget(self.library_search_dock, self.edit_text_dock)
-        self.actionSave.triggered.connect(lambda b: self.save_language_view())
-        self.actionSaveAs.triggered.connect(lambda b: self.save_language_view_as())
+        #self.addDockWidget(Qt.RightDockWidgetArea, self.edit_text_dock)
+        #self.tabifyDockWidget(self.library_search_dock, self.edit_text_dock)
+        self.actionSave.triggered.connect(lambda b: QApplication.instance().save_app_data())
+        self.actionSaveAs.triggered.connect(lambda b: QApplication.instance().save_app_data_as())
         self.actionOpen.triggered.connect(lambda b: self.load_language_view())
         self.actionApplication_font.triggered.connect(lambda b: QApplication.instance().show_app_font_dialog())
         self.actionGraphics_Debugger.toggled.connect(self.toggle_view_graphics_debugger)
@@ -60,6 +60,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._setQueryTimer.setSingleShot(True)        
         self._setQueryTimer.timeout.connect(self._setSelectedItemsAsQuery)
         self._setQueryView = None
+        
+    def __setstate__(self, data):
+        self.__init__()
+        pass
+        
+    def __getstate__(self):
+        return {
+        }    
         
     def set_saved_title(self, saved:bool=True):
         add = ' *' if not saved else ''
@@ -99,7 +107,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
     def remove_language_view(self, view:LanguageView=None):
         if view is None:
-            view = self.current_language_view
+            view = self.current_language_view()
         if view:
             index = self._navigationList.index(view)
             self._navigationList.pop(index)
@@ -114,9 +122,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.language_tabs.removeTab(self.language_tabs.indexOf(view))
             view.scene().selectionChanged.disconnect()
         
-    @property
     def current_language_view(self):
-        return self.current_tab_widget.view_widget
+        tab_widget = self.current_tab_widget
+        
+        if tab_widget:
+            return tab_widget.view_widget
     
     def language_views(self):
         for k in range(self.language_tabs.count()):
@@ -130,32 +140,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.language_tabs.setCurrentWidget(view.parent())
     
     def undo_language_in_view(self):
-        view = self.current_language_view
+        view = self.current_language_view()
         if view:
             view.scene().undo_command()
             
     def redo_language_in_view(self):
-        view = self.current_language_view
+        view = self.current_language_view()
         if view:
             view.scene().redo_command()
             
     def delete_in_language_view(self):
-        view = self.current_language_view
+        view = self.current_language_view()
         if view:
             view.scene().delete_selected()            
             
     def zoom_default_view(self):
-        view = self.current_language_view
+        view = self.current_language_view()
         if view:
             view.zoom_100()
             
     def zoom_in_view(self):
-        view = self.current_language_view
+        view = self.current_language_view()
         if view:
             view.zoom_in()
             
     def zoom_out_view(self):
-        view = self.current_language_view
+        view = self.current_language_view()
         if view:
             view.zoom_out()
             
@@ -212,28 +222,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 view = pickle.load(file)
             self.add_language_view(view)
             view.set_filename(filename)
-            
-    def save_language_view(self, view:LanguageView=None):
-        if view is None:
-            view = self.current_language_view
-        if not view:
-            return
-        filename = view.filename
-        if not filename:
-            self.save_language_view_as(view)
-            return                
-        with open(filename, 'wb') as file:
-            pickle.dump(view, file)
-            
-    def save_language_view_as(self, view:LanguageView=None):
-        if view is None:
-            view = self.current_language_view
-        if not view:
-            return
-        filename,_ = QFileDialog.getSaveFileName(self, 'Save Diagram As', './standard_library', 'Abstract Spacecraft (*.🌌)')
-        if filename:
-            view.set_filename(filename)
-            self.save_language_view(view)
             
     def toggle_view_graphics_debugger(self, enable:bool):
         currentTab = self.language_tabs.currentWidget()

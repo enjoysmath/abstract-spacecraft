@@ -137,8 +137,9 @@ class Object(GraphicsShape, Bounded, Connectable, Container, CollisionResponsive
         
         if self.parentItem():
             self.parentItem().update()
-        if change == self.ItemPositionChange:
-            self.update_connectors()        
+        # BUGFIX: scene to slow with:
+        #if change == self.ItemPositionChange:
+            #self.update_connectors()        
                       
         return super().itemChange(change, value)  
             
@@ -172,10 +173,11 @@ class Object(GraphicsShape, Bounded, Connectable, Container, CollisionResponsive
         Snappable._mouseReleaseEvent(self, event)
         super().mouseMoveEvent(event)
     
-    def setPos(self, pos:QPointF, snap:bool=False):
+    def setPos(self, pos:QPointF, snap:bool=False, update:bool=False):
         if snap:
             pos = self.snap_to_grid_pos(pos)
-            self.update_connectors()
+        if update:
+            self.update_connectors()            
         super().setPos(pos)
         
     #def sceneEventFilter(self, watched, event):

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
 from dialog.mainwindow import MainWindow
 from gfx.definable import Definable
 from PyQt5.QtCore import Qt
@@ -27,7 +27,7 @@ class App(QApplication):
         
     def show_set_definition_dialog(self, definable:Definable):
         self._setDefDialog.accepted.connect(
-            lambda: definable.set_definition(self.topmost_main_window().current_language_view))
+            lambda: definable.set_definition(self.topmost_main_window().current_language_view()))
         self._setDefDialog.show()
         
     def topmost_main_window(self):
@@ -102,3 +102,21 @@ class App(QApplication):
                 
     def is_saved(self):
         return self._saved
+    
+    def save_app_data(self, filename:str=None):
+        if not filename:
+            filename = self._appDataPath
+        
+        if not filename:
+            self.save_app_data_as()
+            return 
+        
+        with open(filename, 'wb') as file:
+            pickle.dump(self.save_app_pickle(), file=file)
+            
+    def save_app_data_as(self):
+        filename,_ = QFileDialog.getSaveFileName(self.topmost_main_window(), 'Save Diagram As', './standard_library', 'Abstract Spacecraft (*.🌌)')
+        
+        if filename:
+            self.save_app_data(filename)
+            self._appDataPath = filename

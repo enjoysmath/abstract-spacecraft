@@ -164,10 +164,10 @@ class LanguageCanvas(QGraphicsScene):
         elif self._movedItems:
             for item in self._movedItems.values():
                 item.setPos(item.pos() + delta)
-                if not isinstance(item, Text):
-                    for arrow in item.connectors:
-                        if id(arrow) not in self._movedItems:
-                            arrow.update()
+                #if not isinstance(item, Text):
+                    #for arrow in item.connectors:
+                        #if id(arrow) not in self._movedItems:
+                            #arrow.update()
         else:
             super().mouseMoveEvent(event)
         
