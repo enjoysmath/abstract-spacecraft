@@ -1,8 +1,7 @@
-from qt_tools import SimpleBrush
+from core.qt_tools import SimpleBrush, set_brush_color
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QMenu
-from qt_tools import set_brush_color
-from color_dialog import ColorDialog
+from dialog.color_dialog import ColorDialog
 
 class ColorFillable:
     def __init__(self):

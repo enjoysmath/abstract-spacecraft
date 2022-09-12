@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QVector2D
 from PyQt5.QtCore import QPointF
-from geom_tools import closest_point_on_path
+from core.geom_tools import closest_point_on_path
 #import arrow
 
 class Bounded:

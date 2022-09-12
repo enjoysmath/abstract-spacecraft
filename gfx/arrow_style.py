@@ -2,14 +2,14 @@ from PyQt5.QtCore import Qt, QRectF, QLineF, QPointF, QTimer, QEvent, QObject, p
 from PyQt5.QtWidgets import QGraphicsObject, QGraphicsSceneMouseEvent, QMenu, QAction
 from PyQt5.QtGui import (QPainter, QPainterPath, QPolygonF, QPainterPathStroker, QColor,
                          QTransform, QVector2D, QPen)
-from geom_tools import (mag2D, dot2D, rect_to_poly, paint_selection_shape, compute_quadratic_bezier, \
+from core.geom_tools import (mag2D, dot2D, rect_to_poly, paint_selection_shape, compute_quadratic_bezier, \
                         cubic_bezier_derivative, compute_cubic_bezier, approx_cubic_bezier_length, \
                         closest_point_on_path)
 from math import acos, asin, atan2, pi, sin, cos, sqrt
-from qt_tools import Pen, set_pen_style, SimpleBrush, set_pen_color, set_pen_width
-from integer_spin_dialog import IntegerSpinDialog
-from double_spin_dialog import DoubleSpinDialog
-from combo_box_dialog import ComboBoxDialog
+from core.qt_tools import Pen, set_pen_style, SimpleBrush, set_pen_color, set_pen_width
+from dialog.integer_spin_dialog import IntegerSpinDialog
+from dialog.double_spin_dialog import DoubleSpinDialog
+from dialog.combo_box_dialog import ComboBoxDialog
 from bidict import bidict
 
 NoTail, VeeTail, HookTail, OppHeadTail, FlatTail = range(5)

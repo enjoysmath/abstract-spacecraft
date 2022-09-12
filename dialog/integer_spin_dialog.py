@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QDialog
-from ui_integer_spin_dialog import Ui_IntegerSpinDialog
+from ui.ui_integer_spin_dialog import Ui_IntegerSpinDialog
 
 class IntegerSpinDialog(QDialog, Ui_IntegerSpinDialog):
     def __init__(self):

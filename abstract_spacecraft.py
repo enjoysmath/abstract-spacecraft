@@ -1,14 +1,14 @@
 from PyQt5.QtGui import QFont
 from core.app import App
 import sys
-from dialog.mainwindow import MainWindow
+
+last_session = 'last_session_pickle.pickle'
 
 if __name__ == '__main__':
     app = App([])
     app.setFont(QFont(app.font().family(), 12))
-    #app.setStyle('fusion')
+    #app.setStyle('fusion')  # TODO remove or put as option / what are other styles?
     
-    window = app.add_new_window()
-    window.add_new_language_view()
+    app.load_last_session_or_blank()
     
     sys.exit(app.exec_())

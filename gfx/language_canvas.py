@@ -9,13 +9,13 @@ import _pickle as pickle
 from gfx.arrow import Arrow
 from core.qt_tools import (SimpleBrush, Pen, filter_out_descendents, first_ancestor_of_type, \
                       simple_max_contrasting_color)
-from container import Container
-from connectable import Connectable
-from control_point import ControlPoint
-from canvas_grid_dialog import CanvasGridDialog
-from graphics_shape import GraphicsShape
-from deletable import Deletable
-from color_dialog import ColorDialog
+from gfx.container import Container
+from gfx.connectable import Connectable
+from gfx.control_point import ControlPoint
+from dialog.canvas_grid_dialog import CanvasGridDialog
+from gfx.graphics_shape import GraphicsShape
+from gfx.deletable import Deletable
+from dialog.color_dialog import ColorDialog
 
 class LanguageCanvas(QGraphicsScene):
     user_text_edited = pyqtSignal(Text)
@@ -140,15 +140,15 @@ class LanguageCanvas(QGraphicsScene):
                 f.update() 
                         
     def _addObject(self, X:Object, parent=None):
-        from undo_cmd import AddObject
+        from core.undo_cmd import AddObject
         self._undoStack.push(AddObject(X, canvas=self, parent=parent))
         
     def _addArrow(self, f:Arrow, parent=None):
-        from undo_cmd import AddArrow
+        from core.undo_cmd import AddArrow
         self._undoStack.push(AddArrow(f, canvas=self, parent=parent))
         
     def _addText(self, T:Text, parent=None):
-        from undo_cmd import AddText
+        from core.undo_cmd import AddText
         self._undoStack.push(AddText(T, canvas=self, parent=parent))
             
     def undo_command(self):
@@ -240,7 +240,7 @@ class LanguageCanvas(QGraphicsScene):
                 self.end_placing_control_point()
             QApplication.instance().topmost_main_window().set_collision_response_enabled(self._collisionResponseSave)
         elif self._movedItems:
-            from undo_cmd import MoveItems
+            from core.undo_cmd import MoveItems
             for item in self._movedItems.values():
                 item.update()
             self._undoStack.push(MoveItems(self._movedItems.values(), event.scenePos() - self._startPos))
@@ -296,7 +296,7 @@ class LanguageCanvas(QGraphicsScene):
             
     def done_editing_text(self):
         if self._editText:
-            from undo_cmd import EditText
+            from core.undo_cmd import EditText
             self._editText.done_editing()
             self._undoStack.push(EditText(self._editText, before=self._textBeforeEdit))
             self._editText = None        

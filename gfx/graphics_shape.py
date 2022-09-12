@@ -1,11 +1,11 @@
-from qt_tools import Pen, simple_max_contrasting_color, set_pen_style, set_pen_color
+from core.qt_tools import Pen, simple_max_contrasting_color, set_pen_style, set_pen_color
 from PyQt5.QtGui import QPainterPath, QColor
 from PyQt5.QtCore import Qt, QRectF, pyqtSignal
 from PyQt5.QtWidgets import QGraphicsObject, QMenu
-from containable import Containable
+from gfx.containable import Containable
 import stringcase
-from text import Text
-from color_dialog import ColorDialog
+from gfx.text import Text
+from dialog.color_dialog import ColorDialog
 
 class GraphicsShape(QGraphicsObject):
     def __init__(self):

@@ -47,7 +47,7 @@ proj.directory-list = [{'dirloc': loc('.'),
 proj.file-list = [loc('gfx/connectable.py'),
                   loc('gfx/language_canvas.py'),
                   loc('gfx/language_view.py'),
-                  loc('gfx/text.py'),
-                  loc('ui/object.py')]
+                  loc('gfx/object.py'),
+                  loc('gfx/text.py')]
 proj.file-type = 'shared'
 proj.main-file = loc('abstract_spacecraft.py')

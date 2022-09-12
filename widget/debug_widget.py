@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget
-from ui_debug_widget import Ui_DebugWidget
-from debug_watch_widget import DebugWatchWidget
+from ui.ui_debug_widget import Ui_DebugWidget
+from widget.debug_watch_widget import DebugWatchWidget
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QCursor, QTransform
 

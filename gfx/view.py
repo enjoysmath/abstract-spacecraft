@@ -5,7 +5,7 @@ from copy import deepcopy
 from core.geom_tools import min_bounding_rect
 import dill as pickle
 import core.app
-from undo_commands.drop_undo import DropUndo
+from core.drop_undo import DropUndo
 from widget.node import Node
 from core.qt_tools import set_pixmap_opacity
 

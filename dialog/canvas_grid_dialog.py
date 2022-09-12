@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import QPointF, pyqtSignal, Qt
-from ui_canvas_grid_dialog import Ui_CanvasGridDialog
+from ui.ui_canvas_grid_dialog import Ui_CanvasGridDialog
 
 class CanvasGridDialog(QDialog, Ui_CanvasGridDialog):
     redraw_canvas_background = pyqtSignal()

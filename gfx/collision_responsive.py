@@ -17,7 +17,7 @@ class CollisionResponsive:
         self._bboxCollisionResponse()
         
     def _bboxCollisionResponse(self):
-        from text import Text
+        from gfx.text import Text
         if not QApplication.instance().topmost_main_window().collision_response_enabled:
             return
         if not self.scene():

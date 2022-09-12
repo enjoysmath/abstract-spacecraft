@@ -19,7 +19,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def __init__(self):
         QMainWindow.__init__(self)
-        Ui_MainWindow.__init__(self)
+        self._baseTitle = self.windowTitle()        
+        Ui_MainWindow.__init__(self)        
         self.setupUi(self)
         self.language_tabs = LanguageViewTabs()
         self.setCentralWidget(self.language_tabs)
@@ -29,9 +30,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionZoom_Default.triggered.connect(lambda b: self.zoom_default_view())
         self.actionZoom_In.triggered.connect(lambda b: self.zoom_in_view())
         self.actionZoom_Out.triggered.connect(lambda b: self.zoom_out_view())
-        self.actionNew_Window.triggered.connect(lambda b: QApplication.instance().add_new_window())
-        self.actionNew_Tab.triggered.connect(lambda b: self.add_new_language_view())
-        self.actionClose_Diagram.triggered.connect(lambda b: self.remove_language_view())
+        self.actionNewWindow.triggered.connect(lambda b: QApplication.instance().add_new_window())
+        self.actionNewFreeDrawing.triggered.connect(lambda b: self.add_new_language_view())
+        #self.actionCloseWindow.triggered.connect(lambda b: self.remove_language_view())
+        self.actionCloseEntireApp.triggered.connect(lambda b: QApplication.instance().quit())
+        self.actionCloseWindow.triggered.connect(lambda b: self.close())
         self.actionBack.triggered.connect(lambda b: self.navigate_back())
         self.actionForward.triggered.connect(lambda b: self.navigate_forward())
         self.language_tabs.currentChanged.connect(self.language_view_tab_changed)
@@ -40,9 +43,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.addDockWidget(Qt.RightDockWidgetArea, self.library_search_dock)
         self.addDockWidget(Qt.RightDockWidgetArea, self.edit_text_dock)
         self.tabifyDockWidget(self.library_search_dock, self.edit_text_dock)
-        self.actionSave_Diagram.triggered.connect(lambda b: self.save_language_view())
-        self.actionSave_diagram_as.triggered.connect(lambda b: self.save_language_view_as())
-        self.actionLoad_diagram.triggered.connect(lambda b: self.load_language_view())
+        self.actionSave.triggered.connect(lambda b: self.save_language_view())
+        self.actionSaveAs.triggered.connect(lambda b: self.save_language_view_as())
+        self.actionOpen.triggered.connect(lambda b: self.load_language_view())
         self.actionApplication_font.triggered.connect(lambda b: QApplication.instance().show_app_font_dialog())
         self.actionGraphics_Debugger.toggled.connect(self.toggle_view_graphics_debugger)
         self.actionBack.setEnabled(False)
@@ -57,6 +60,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._setQueryTimer.setSingleShot(True)        
         self._setQueryTimer.timeout.connect(self._setSelectedItemsAsQuery)
         self._setQueryView = None
+        
+    def set_saved_title(self, saved:bool=True):
+        add = ' *' if not saved else ''
+        super().setWindowTitle(self._baseTitle + add)
+        
+    def setWindowTitle(self, title:str):
+        if self._baseTitle != title:
+            self._baseTitle = title
+            self.set_saved_title(saved=QApplication.instance().is_saved())
                         
     def add_language_view(self, view:LanguageView):     
         if self._navigationPos is None:

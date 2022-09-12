@@ -66,7 +66,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
         super().update()
         parent = self.parentItem()
         
-        from arrow import Arrow        
+        from gfx.arrow import Arrow        
         if parent:
             if isinstance(parent, Arrow):
                 if parent.parentItem():
@@ -92,13 +92,13 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
         super().keyPressEvent(event)
         
     def mousePressEvent(self, event):
-        from object import Object
+        from gfx.object import Object
         if self._restorePos is None and isinstance(self.parentItem(), Object):
             self._restorePos = self.pos()
         super().mousePressEvent(event)
         
     def mouseReleaseEvent(self, event):
-        from object import Object
+        from gfx.object import Object
         parent = self.parentItem()
         
         if isinstance(parent, Object):
@@ -126,7 +126,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
         rect = self.boundingRect()
         delta = rect.center() - self._center
         parent = self.parentItem()
-        from object import Object
+        from gfx.object import Object
         if isinstance(parent, Object):
             pos = parent.mapToParent(parent.mapFromScene(parent.scenePos() + delta))
             parent.setPos(pos, snap=True)

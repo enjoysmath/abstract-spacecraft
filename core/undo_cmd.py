@@ -1,13 +1,13 @@
 from PyQt5.QtWidgets import QUndoCommand
 from PyQt5.QtCore import Qt, QPointF
 from collections import OrderedDict
-from object import Object
-from language_canvas import LanguageCanvas
-from arrow import Arrow
-from geom_tools import center_scene_pos_of_items
-from text import Text
-from container import Container
-from control_point import ControlPoint
+from gfx.object import Object
+from gfx.language_canvas import LanguageCanvas
+from gfx.arrow import Arrow
+from core.geom_tools import center_scene_pos_of_items
+from gfx.text import Text
+from gfx.container import Container
+from gfx.control_point import ControlPoint
 
 class UndoCmd(QUndoCommand):
     pass

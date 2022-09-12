@@ -2,13 +2,13 @@ from PyQt5.QtWidgets import (QDockWidget, QGridLayout, QApplication, QPlainTextE
                              QWidget)
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
-from ui_edit_text_dockwidget import Ui_EditTextDockWidget
-from edit_text_widget import EditTextWidget
-from object import Object
-from arrow import Arrow
-from text import Text
-from unicode_tools import check_for_int
-from unicode_support import UnicodeSupport
+from ui.ui_edit_text_dockwidget import Ui_EditTextDockWidget
+from widget.edit_text_widget import EditTextWidget
+from gfx.object import Object
+from gfx.arrow import Arrow
+from gfx.text import Text
+from core.unicode_tools import check_for_int
+from core.unicode_support import UnicodeSupport
 from bidict import bidict
 
 class EditTextDockWidget(QDockWidget, Ui_EditTextDockWidget):

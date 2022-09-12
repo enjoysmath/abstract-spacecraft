@@ -1,5 +1,5 @@
 import re
-from python_tools import escape_regex_str
+from core.python_tools import escape_regex_str
 
 class VariableTemplateRegex:
     Variable, TextString = range(2)
