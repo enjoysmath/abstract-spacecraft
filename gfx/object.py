@@ -121,7 +121,7 @@ class Object(GraphicsShape, Bounded, Connectable, Container, CollisionResponsive
     def update(self):       
         self.prepareGeometryChange()
         self._updateBoundingBox()
-        self.bbox_collision_response()        
+        #self.bbox_collision_response()        
         self._updatePaintPath()
         self._updateSelectionPath()
         if not self.scene() or len(self.scene().items_being_moved) <= 1:
@@ -133,7 +133,7 @@ class Object(GraphicsShape, Bounded, Connectable, Container, CollisionResponsive
     def itemChange(self, change, value):              
         value = Connectable._itemChange(self, change, value)
         value = Containable._itemChange(self, change, value)
-        value = CollisionResponsive._itemChange(self, change, value)       
+        #value = CollisionResponsive._itemChange(self, change, value)       
         
         if self.parentItem():
             self.parentItem().update()

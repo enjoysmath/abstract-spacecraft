@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication, QFileDialog, \
                              QGridLayout, QWidget, QActionGroup)
 from ui.ui_mainwindow import Ui_MainWindow
 from widget.language_view_tabs import LanguageViewTabs
-from gfx.language_view import LanguageView, LanguageCanvas
+from gfx.language_gfx_view import LanguageGfxView, LanguageCanvas
 from gfx.text import Text
 from PyQt5.QtCore import Qt, QRectF, QTimer
 #from widget.edit_text_dockwidget import EditTextDockWidget
@@ -16,6 +16,8 @@ from gfx.text import Text
 class MainWindow(QMainWindow, Ui_MainWindow):
     new_tab_base_name = '🌌'
     set_query_wait_millisecs = 750
+    
+    DefinitionMode, TextMode, ArrowMode, MoveMode, NumEditModes = range(5)
     
     def __init__(self):
         QMainWindow.__init__(self)
@@ -45,7 +47,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.tabifyDockWidget(self.library_search_dock, self.edit_text_dock)
         self.actionSave.triggered.connect(lambda b: QApplication.instance().save_app_data())
         self.actionSaveAs.triggered.connect(lambda b: QApplication.instance().save_app_data_as())
-        self.actionOpen.triggered.connect(lambda b: self.load_language_view())
+        self.actionOpen.triggered.connect(lambda b: QApplication.instance().load_app_data())
         self.actionApplication_font.triggered.connect(lambda b: QApplication.instance().show_app_font_dialog())
         self.actionGraphics_Debugger.toggled.connect(self.toggle_view_graphics_debugger)
         self.actionBack.setEnabled(False)
@@ -66,14 +68,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._cassetteButtonGroup.addAction(self.actionEdit_Text)
         self._cassetteButtonGroup.addAction(self.actionBook_Lookup)
         self._cassetteButtonGroup.setExclusive(True)
+        self._cassetteButtonGroup.triggered.connect(self.edit_mode_button_triggered)
+        self._editMode = self.ArrowMode
+
+    _windowStatesEnum = {
+        0x00000000 : Qt.WindowNoState,          #		The window has no state set (in normal state).
+        0x00000001 : Qt.WindowMinimized,        #		The window is minimized (i.e. iconified).
+        0x00000002 : Qt.WindowMaximized,	      #      The window is maximized with a frame around it.
+        0x00000004 : Qt.WindowFullScreen,	      #      The window fills the entire screen without any frame around it.
+        0x00000008 : Qt.WindowActive,		      # The window is the active window, i.e. it has keyboard focus.        
+    }
         
     def __setstate__(self, data):
         self.__init__()
-        pass
+        for widget in data['tab widgets']:
+            self.add_language_view(widget)
+        self.setGeometry(data['geometry'])
+        self.setWindowState(self._windowStatesEnum[data['window state']])
         
     def __getstate__(self):
         return {
+            'tab widgets' : list(self.language_views()),
+            'geometry' : self.geometry(),
+            'window state' : int(self.windowState()),
         }    
+    
+    def edit_mode_button_triggered(self):
+        if self.actionBook_Lookup.isChecked():
+            self._editMode = self.DefinitionMode
+        elif self.actionEdit_Text.isChecked():
+            self._editMode = self.TextMode
+        elif self.actionPlace_Arrow.isChecked():
+            self._editMode = self.ArrowMode
+        elif self.actionMoveStuffMode.isChecked():
+            self._editMode = self.MoveMode
+            
+    @property
+    def language_edit_mode(self):
+        return self._editMode
         
     def set_saved_title(self, saved:bool=True):
         add = ' *' if not saved else ''
@@ -84,7 +116,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._baseTitle = title
             self.set_saved_title(saved=QApplication.instance().is_saved())
                         
-    def add_language_view(self, view:LanguageView):     
+    def add_language_view(self, view:LanguageGfxView):     
         if self._navigationPos is None:
             self._navigationPos = 0
         else:
@@ -111,7 +143,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         selected_items = filter(lambda x: isinstance(x, (Object, Arrow)), selected_items)
         self.library_search_dock.set_items_as_query(selected_items, self._setQueryView)
         
-    def remove_language_view(self, view:LanguageView=None):
+    def remove_language_view(self, view:LanguageGfxView=None):
         if view is None:
             view = self.current_language_view()
         if view:
@@ -142,7 +174,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def current_tab_widget(self):
         return self.language_tabs.currentWidget()
     
-    def set_current_language_view(self, view:LanguageView):
+    def set_current_language_view(self, view:LanguageGfxView):
         self.language_tabs.setCurrentWidget(view.parent())
     
     def undo_language_in_view(self):
@@ -178,7 +210,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def add_new_language_view(self):
         canvas = LanguageCanvas()
         canvas.user_text_edited.connect(self.process_user_edited_text_item)
-        view = LanguageView(canvas)           
+        view = LanguageGfxView(canvas)           
         tabName = self.new_tab_base_name + str(self._newTabCount)
         view.set_tab_name(tabName)
         self.add_language_view(view)
@@ -206,11 +238,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toggle_enable_navigate_buttons()
         self.toggle_view_graphics_debugger(self.actionGraphics_Debugger.isChecked())
         
-    def navigate_to_language_view(self, view:LanguageView):
+    def navigate_to_language_view(self, view:LanguageGfxView):
         self._navigationPos += 1
         self._navigationList = self._navigationList[:self._navigationPos]
         self._navigationList.append(view)
-        self.language_tabs.setCurrentWidget(view)
+        self.language_tabs.setCurrentWidget(view.parentWidget())
                 
     @property
     def place_arrow_mode(self):
@@ -219,15 +251,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @property
     def edit_text_mode(self):
         return self.actionEdit_Text.isChecked()
-    
-    def load_language_view(self, filename:str=None) -> LanguageCanvas:
-        if filename is None:
-            filenames,_ = QFileDialog.getOpenFileNames(self, 'Open Diagram(s)', './standard_library', 'Abstract Spacecraft (*.🌌)')
-        for filename in filenames:            
-            with open(filename, 'rb') as file:
-                view = pickle.load(file)
-            self.add_language_view(view)
-            view.set_filename(filename)
             
     def toggle_view_graphics_debugger(self, enable:bool):
         currentTab = self.language_tabs.currentWidget()
@@ -259,3 +282,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def process_user_edited_text_item(self, text:Text):
         print(text.toPlainText())
+        
+    def closeEvent(self, event):
+        app = QApplication.instance()
+        app.save_app_data()
+        app.quit()
+        super().closeEvent(event)

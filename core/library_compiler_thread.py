@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QThread
+from PyQt5.QtWidgets import QApplication
 import _pickle as pickle
-from core.networkx_tools import networkx_graph
+from lang.networkx_tools import networkx_graph
 import networkx as nx
 
 class LibraryCompilerThread(QThread):
@@ -11,12 +12,14 @@ class LibraryCompilerThread(QThread):
         self._compiledGraph = nx.Graph()
         
     def run(self):
+        app = QApplication.instance()
+        app.load_document_from 
         for filename in self._filenames:
-            with open(filename, 'rb') as file:
-                view = pickle.load(file)
-                graph = networkx_graph(view.scene().items())
-                self._compiledGraph.add_nodes_from(graph.nodes())
-                self._compiledGraph.add_edges_from(graph.edges())
+            documents = app.documents_from_data_file(filename)
+        
+            #// graph = networkx_graph(view.scene().items())
+            #// self._compiledGraph.add_nodes_from(graph.nodes())
+            #// self._compiledGraph.add_edges_from(graph.edges())
                 
         print(self._compiledGraph)
         print(self._compiledGraph.nodes())

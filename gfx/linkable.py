@@ -1,31 +1,40 @@
-from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtWidgets import QMenu
+from PyQt5.QtWidgets import QApplication, QMenu
+from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtCore import QUrl
 
-class Linkable(QObject):
-   open_link_requested = pyqtSignal(str)
-   edit_link_requested = pyqtSignal(QObject)
+class Linkable:
+    def __init__(self):
+        self._link = None
 
-   def __init__(self, parent=None):
-      super().__init__(parent)
-      self._fullpathLink = None
-
-   def _setState(self, data:dict):
-      self._fullpathLink = data['fullpath link']
-
-   def _getState(self, data:dict):
-      data['fullpath link'] = self._fullpathLink
-      return data
-
-   @property
-   def full_path_to_link(self):
-      return self._fullpathLink
-   
-   def open_link(self):
-      if self._fullpathLink is not None:
-         self.open_link_requested.emit(self._fullpathLink)
-
-   def build_context_menu(self, menu:QMenu):
-      menu.addAction('Edit Link').triggered.connect(self.edit_link_requested.emit(self))
-
-
-
+    def _setState(self, data:dict):
+        self._link = data['definition']
+        
+    def _getState(self, data:dict):
+        data['definition'] = self._link
+        return data
+        
+    def build_context_menu(self, menu:QMenu):
+        if self._link is not None:
+            menu.addAction('Definition').triggered.connect(lambda b: self.goto_link())
+        menu.addAction('Set definition').triggered.connect(lambda b: self.user_navigates_to_link())
+        
+    def user_navigates_to_link(self):
+        QApplication.instance().show_set_definition_dialog(linkable=self)
+                    
+    def goto_link(self):
+        from gfx.language_gfx_view import LanguageGfxView
+        
+        if isinstance(self.link, str):
+            QDesktopServices.openUrl(QUrl(self.link))
+        elif isinstance(self.link, LanguageGfxView):
+            window = self.link.window()
+            window.raise_()
+            window.navigate_to_language_view(self.link)
+            
+    def set_link(self, link):
+        self._link = link
+        
+    @property
+    def link(self):
+        return self._link
+                 

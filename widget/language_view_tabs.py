@@ -2,7 +2,7 @@ from widget.tab_widget import TabWidget
 from dialog.diagram_name_dialog import DiagramNameDialog
 from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QMenu
-from gfx.language_view import LanguageView
+from gfx.language_gfx_view import LanguageGfxView
 
 class LanguageViewTabs(TabWidget):
     def __init__(self):
@@ -22,7 +22,7 @@ class LanguageViewTabs(TabWidget):
             lambda b: self.show_tab_rename_dialog(self.tab_index_under_screen_pos(screen_pos)))
         menu.exec_(screen_pos)            
         
-    def language_view_widget(self, tab_index:int) -> LanguageView:
+    def language_view_widget(self, tab_index:int) -> LanguageGfxView:
         for child in self.widget(tab_index).children():
-            if isinstance(child, LanguageView):
+            if isinstance(child, LanguageGfxView):
                 return child

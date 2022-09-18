@@ -4,14 +4,14 @@ from PyQt5.QtCore import Qt, QPointF, QRectF, QObject #QElapsedTimer
 from gfx.containable import Containable
 from gfx.collision_responsive import CollisionResponsive
 from gfx.drag_droppable import DragDroppable
-from gfx.definable import Definable
+from gfx.linkable import Linkable
 from gfx.snappable import Snappable
 from core.qt_tools import unpickle_gfx_item_flags
 from gfx.deletable import Deletable
 from gfx.has_context_menu import HasContextMenu
 import gfx.container
 
-class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, Definable, 
+class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, Linkable, 
            Snappable, HasContextMenu, Deletable):
     default_interaction = Qt.NoTextInteraction # Qt.TextBrowserInteraction  TODO have this be a context menu check option
     #_collisionSave = None     # Used for a bugfix
@@ -21,7 +21,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
         Containable.__init__(self)
         CollisionResponsive.__init__(self)
         DragDroppable.__init__(self)
-        Definable.__init__(self)
+        Linkable.__init__(self)
         Snappable.__init__(self)
         HasContextMenu.__init__(self)
         Deletable.__init__(self)
@@ -45,7 +45,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
         self.setPos(data['pos'])
         Containable._setState(self, data['containable'])
         DragDroppable._setState(self, data['drag droppable'])
-        Definable._setState(self, data['definable'])
+        Linkable._setState(self, data['definable'])
         Deletable._setState(self, data['deletable'])
         
     def __getstate__(self):
@@ -56,12 +56,15 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
             'pos' : self.pos(),
             'containable' : Containable._getState(self, {}),
             'drag droppable' : DragDroppable._getState(self, {}),
-            'definable' : Definable._getState(self, {}),
+            'definable' : Linkable._getState(self, {}),
             'deletable' : Deletable._getState(self, {}),
         }
                         
     def update(self):
-        if QApplication.instance().topmost_main_window().text_collision_response_enabled:
+        window = QApplication.instance().topmost_main_window()
+        if not window:
+            return
+        if window.text_collision_response_enabled:
             self.bbox_collision_response()
         Containable.update(self)
         super().update()
@@ -99,24 +102,29 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
             #return
         #elif not self._doubleClickTimer.hasExpired(self.scene().double_click_timeout_ms):
             #return
-         
-        from gfx.object import Object
-        if self._restorePos is None and isinstance(self.parentItem(), Object):
-            self._restorePos = self.pos()
-        super().mousePressEvent(event)
+        window = QApplication.activeWindow()
+        
+        if window.language_edit_mode == window.MoveMode:    
+            from gfx.object import Object
+            if self._restorePos is None and isinstance(self.parentItem(), Object) and self.contained_in_bbox:
+                self._restorePos = self.pos()
+            super().mousePressEvent(event)
             #self._doubleClickTimer = None
         
     def mouseReleaseEvent(self, event):
         from gfx.object import Object
         parent = self.parentItem()
+        window = QApplication.activeWindow()
         
         if isinstance(parent, Object):
-            if self._restorePos is not None:
+            if self._restorePos is not None and self.contained_in_bbox:
                 self.setPos(self._restorePos)
-                pos = event.scenePos()
-                pos = parent.mapToParent(parent.mapFromScene(pos))
-                parent.setPos(pos, snap=True)
-                parent.update_connectors()
+                if window.language_edit_mode == window.MoveMode:    
+                    
+                    pos = event.scenePos()
+                    pos = parent.mapToParent(parent.mapFromScene(pos))
+                    parent.setPos(pos, snap=True)
+                    parent.update_connectors()
                 self._restorePos = None
             
         super().mouseReleaseEvent(event)
@@ -154,8 +162,8 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
             self.update()
             
     def itemChange(self, change, value):
-        if QApplication.instance().topmost_main_window().text_collision_response_enabled:
-            value = CollisionResponsive._itemChange(self, change, value)
+        #if QApplication.instance().topmost_main_window().text_collision_response_enabled:
+            #value = CollisionResponsive._itemChange(self, change, value)
         #if change == self.ItemPositionChange:
             #parent = self.parentItem()
             #if parent and parent.count_children_of_type(Text) == 1:
@@ -194,7 +202,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
         if oneNodeOneLabel:
             menu.addSection(self.__class__.__name__)
             
-        Definable.build_context_menu(self, menu)
+        Linkable.build_context_menu(self, menu)
         Containable.build_context_menu(self, menu)
         Snappable.build_context_menu(self, menu)
         Deletable.build_context_menu(self, menu)        
@@ -207,6 +215,8 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, D
     def is_single_node_and_label(self):
         parent = self.parentItem()
         siblings = parent.childItems()
+        if not siblings:
+            return False
         if parent and isinstance(parent, HasContextMenu):
             if len(siblings) == 1:
                 return True

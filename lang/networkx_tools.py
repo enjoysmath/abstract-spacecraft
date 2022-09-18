@@ -5,6 +5,11 @@ import networkx as nx
 from gfx.arrow import Arrow
 from gfx.object import Object
 from gfx.text import Text
+from bidict import bidict
+import time
+
+
+
 
 def regex_node_match(data1, data2):
     """

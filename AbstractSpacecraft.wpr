@@ -46,7 +46,7 @@ proj.directory-list = [{'dirloc': loc('.'),
                         'watch_for_changes': True}]
 proj.file-list = [loc('gfx/connectable.py'),
                   loc('gfx/language_canvas.py'),
-                  loc('gfx/language_view.py'),
+                  loc('gfx/language_gfx_view.py'),
                   loc('gfx/object.py'),
                   loc('gfx/text.py')]
 proj.file-type = 'shared'

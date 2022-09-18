@@ -1,6 +1,6 @@
 from gfx.connectable import Connector, Connectable
 from PyQt5.QtCore import pyqtSignal, Qt, QRectF, QLineF, QPointF, QTimer, QEvent
-from PyQt5.QtWidgets import QGraphicsObject, QGraphicsSceneMouseEvent, QMenu, QAction
+from PyQt5.QtWidgets import QGraphicsObject, QGraphicsSceneMouseEvent, QMenu, QAction, QApplication
 from PyQt5.QtGui import (QPainter, QPainterPath, QPolygonF, QPainterPathStroker, QColor,
                          QTransform, QVector2D)
 from core.geom_tools import mag2D, dot2D, rect_to_poly, paint_selection_shape, closest_point_on_path
@@ -594,14 +594,16 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
         return "(" + arg + ")"
     
     def hoverEnterEvent(self, event):
-        if self.scene():            
+        window = QApplication.activeWindow()
+        if self.scene() and window.language_edit_mode in (window.ArrowMode, window.MoveMode):
             if self._editTimer:
                 self._editTimer.stop()
             self.set_control_points_visible(True)
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
-        if self.scene():
+        window = QApplication.instance().topmost_main_window()
+        if self.scene() and window.language_edit_mode in (window.ArrowMode, window.MoveMode):            
             if self._editTimer:
                 self._editTimer.stop()
             self._editTimer = QTimer()

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QGraphicsScene, QUndoStack, QApplication, QMenu
+from PyQt5.QtWidgets import QGraphicsScene, QUndoStack, QApplication, QMenu, QGraphicsItem
 from PyQt5.QtGui import QColor, QPainter, QPen, QTransform, QDrag
 from PyQt5.QtCore import QPointF, Qt, QMimeData, pyqtSignal #QElapsedTimer
 from functools import cmp_to_key
@@ -7,6 +7,7 @@ from gfx.object import Object
 from gfx.collision_responsive import CollisionResponsive
 import _pickle as pickle
 from gfx.arrow import Arrow
+from gfx.linkable import Linkable
 from core.qt_tools import (SimpleBrush, Pen, filter_out_descendents, first_ancestor_of_type, \
                       simple_max_contrasting_color)
 from gfx.container import Container
@@ -20,9 +21,12 @@ from dialog.color_dialog import ColorDialog
 class LanguageCanvas(QGraphicsScene):
     user_text_edited = pyqtSignal(Text)
     mouse_pressed = pyqtSignal(QPointF)
+    set_definition_requested = pyqtSignal(QGraphicsItem)
+    
     init_object_text = '🌍'
     init_arrow_text = '🚀'
     init_remark_text = "Remark"
+    init_label_text = "Label"
     default_background_color = QColor(237, 255, 241)
     #double_click_timeout_ms = 200
     
@@ -80,31 +84,37 @@ class LanguageCanvas(QGraphicsScene):
         return self._backgroundBrush
 
     def mouseDoubleClickEvent(self, event):        
-        item = self.itemAt(event.scenePos(), QTransform())
         window = QApplication.activeWindow()
-        if not window.place_arrow_mode:
-            if item is None:            
-                # Canvas background clicked
-                if window.edit_text_mode:
-                    T = Text(html=self.init_remark_text)
-                    self._addText(T)
-                    T.setPos(event.scenePos())
-                    T.update()
+        item = self.itemAt(event.scenePos(), QTransform())
+        
+        if window.language_edit_mode == window.DefinitionMode:
+            if isinstance(item, Linkable):
+                if item.link is None:
+                    item.user_navigates_to_link()
                 else:
-                    X = Object(self.init_object_text)    
-                    self._addObject(X) 
-                    X.setPos(event.scenePos(), snap=True)
-                    X.update()
+                    item.goto_link()
+            event.accept()
+                
+        elif window.language_edit_mode == window.TextMode:
+            T = Text(html=self.init_label_text)
+            T.set_contained_in_bbox(contained=False)
+            self._addText(T, parent=item)
+            if item is None:
+                T.setPos(event.scenePos())
             else:
-                if isinstance(item, Text) and window.edit_text_mode:
-                    super().mouseDoubleClickEvent(event)
-                    return                                
-                item = first_ancestor_of_type(Container, item)   
-                if item:
-                    X = Object(self.init_object_text)
-                    self._addObject(X, parent=item)
-                    X.setPos(X.mapFromScene(event.scenePos()), snap=True)
-        else:
+                T.setPos(item.mapFromScene(event.scenePos()))
+            T.update()    
+            
+        elif window.language_edit_mode == window.DefinitionMode:
+            if item is not None:
+                self.set_definition_requested.emit(item)
+            else:
+                X = Object(self.init_object_text)    
+                self._addObject(X) 
+                X.setPos(event.scenePos(), snap=True)
+                X.update() 
+                
+        elif window.language_edit_mode == window.ArrowMode:
             if isinstance(item, ControlPoint):
                 X = Object(self.init_object_text)
                 parent = item.parentItem()
@@ -112,7 +122,7 @@ class LanguageCanvas(QGraphicsScene):
                 parent.set_at_point(item, X)    
                 parent = parent.parentItem()
                 if not parent:
-                    X.setPos(event.scenePos())
+                    X.setPos(event.scenePos(), snap=True)
                 else:
                     X.setPos(parent.mapFromScene(event.scenePos()), snap=True)
                 self.end_placing_control_point()
@@ -120,10 +130,6 @@ class LanguageCanvas(QGraphicsScene):
             else:                
                 f = Arrow(text=self.init_arrow_text)
                 if item is None:                
-                    #self._addArrow(f)
-                    #f.destination_point.setPos(f.mapFromScene(event.scenePos() + QPointF(50, 0)))
-                    #f.update()
-                    # Canvas background clicked
                     X = Object(self.init_object_text)    
                     self._addObject(X) 
                     X.setPos(event.scenePos(), snap=True)
@@ -160,86 +166,84 @@ class LanguageCanvas(QGraphicsScene):
         self._undoStack.redo()
         
     def mouseMoveEvent(self, event):
-        delta = event.scenePos() - event.lastScenePos()
-        if self._controlPoint:
-            self._controlPoint.setPos(self._controlPoint.pos() + delta)
-        elif self._movedItems:
-            for item in self._movedItems.values():
-                item.setPos(item.pos() + delta)
-                #if not isinstance(item, Text):
-                    #for arrow in item.connectors:
-                        #if id(arrow) not in self._movedItems:
-                            #arrow.update()
-        else:
-            super().mouseMoveEvent(event)
+        from dialog.mainwindow import MainWindow
+        window = QApplication.activeWindow()
+        
+        if isinstance(window, MainWindow):
+            delta = event.scenePos() - event.lastScenePos()
+            
+            if self._controlPoint:
+                self._controlPoint.setPos(self._controlPoint.pos() + delta)
+            elif self._movedItems:
+                for item in self._movedItems.values():
+                    item.setPos(item.pos() + delta)
+                    #if not isinstance(item, Text):
+                        #for arrow in item.connectors:
+                            #if id(arrow) not in self._movedItems:
+                                #arrow.update()
+            else:
+                if window.language_edit_mode == window.MoveMode:
+                    super().mouseMoveEvent(event)
         
     def mousePressEvent(self, event):
-        #if self._doubleClickTimer is None:
-            #self._doubleClickTimer = QElapsedTimer()
-            #self._doubleClickTimer.start()
-            #return
-        #elif not self._doubleClickTimer.hasExpired(self.double_click_timeout_ms):
-            #return
-        
-        #if event.button() != Qt.RightButton:
-            #return
-            
         self.mouse_pressed.emit(event.scenePos())        
         item = self.itemAt(event.scenePos(), QTransform())      
         superCall = True
+        window = QApplication.activeWindow()
         
-        if event.button() == Qt.LeftButton: 
-            if item:
-                if item is not self._editText:   
-                    if self._controlPoint is None:
-                        if isinstance(item, ControlPoint):
-                            self.place_control_point(item, skip_release=False)   
-                            superCall = False   # BUGFIX
-                            event.accept()      # BUGFIX
-                            # These last two lines fix a bug, where the control point
-                            # would jump away from the cursor and sometimes into hyperspace.                            
-                        elif QApplication.keyboardModifiers() & Qt.ControlModifier:
-                            if not isinstance(item, Text):
-                                item.setSelected(not item.isSelected())
-                        else:
-                            self._startPos = event.scenePos()
-                            if item.isSelected():
-                                itemsToMove = self.selectedItems() 
-                                itemsToMove = {id(item): item for item in itemsToMove}
-                                                                
-                                for item in itemsToMove.values():          
-                                    if isinstance(item, (Arrow, Object)):
-                                        self._movedItems[id(item)] = item   
-                                        for arrow in item.connectors:
-                                            if id(arrow) not in itemsToMove and id(arrow) not in self._movedItems:
-                                                if id(arrow.source) in itemsToMove and id(arrow.destination) in itemsToMove:
-                                                    self._movedItems[id(arrow)] = arrow
-                                    elif isinstance(item, Text):
-                                        parent = item.parentItem()
-                                        
-                                        if isinstance(parent, Object):
-                                            self._movedItems[id(parent)] = parent
-                                        
-                                        elif item.flags() & item.ItemIsMovable:
-                                            self._movedItems[id(item)] = item   
-                                    
-                                self._movedItems = {id(item) : item for item in filter_out_descendents(self._movedItems.values()) }       
-                            else:
-                                if isinstance(item, Text):
-                                    parent = item.parentItem()
-                                    if isinstance(parent, Object):
-                                        item = parent
-                                self._movedItems = {id(item) : item}                            
-                    else:
-                        self.connect_arrow_by_control_point(self.items(event.scenePos()))
-        elif event.button() == Qt.RightButton and \
-             QApplication.keyboardModifiers() & Qt.ControlModifier:
-            if self._controlPoint:
-                self.end_placing_control_point()
-            else:
+        if window.language_edit_mode in (window.MoveMode, window.ArrowMode, window.TextMode):
+            if event.button() == Qt.LeftButton: 
                 if item:
-                    if item is not self._editText:
-                        self.start_drag_items(item, event)
+                    if item is not self._editText:   
+                        if self._controlPoint is None:
+                            if isinstance(item, ControlPoint):
+                                self.place_control_point(item, skip_release=False)   
+                                superCall = False   # BUGFIX
+                                event.accept()      # BUGFIX
+                                # These last two lines fix a bug, where the control point
+                                # would jump away from the cursor and sometimes into hyperspace.                            
+                            elif QApplication.keyboardModifiers() & Qt.ControlModifier:
+                                if not isinstance(item, Text):
+                                    item.setSelected(not item.isSelected())
+                            else:
+                                self._startPos = event.scenePos()
+                                if item.isSelected():
+                                    itemsToMove = self.selectedItems() 
+                                    itemsToMove = {id(item): item for item in itemsToMove}
+                                                                    
+                                    for item in itemsToMove.values():          
+                                        if isinstance(item, (Arrow, Object)):
+                                            self._movedItems[id(item)] = item   
+                                            for arrow in item.connectors:
+                                                if id(arrow) not in itemsToMove and id(arrow) not in self._movedItems:
+                                                    if id(arrow.source) in itemsToMove and id(arrow.destination) in itemsToMove:
+                                                        self._movedItems[id(arrow)] = arrow
+                                        elif isinstance(item, Text):
+                                            parent = item.parentItem()
+                                            
+                                            if isinstance(parent, Object):
+                                                self._movedItems[id(parent)] = parent
+                                            
+                                            elif item.flags() & item.ItemIsMovable:
+                                                self._movedItems[id(item)] = item   
+                                        
+                                    self._movedItems = {id(item) : item for item in filter_out_descendents(self._movedItems.values()) }       
+                                else:
+                                    if isinstance(item, Text):
+                                        parent = item.parentItem()
+                                        if isinstance(parent, Object):
+                                            item = parent
+                                    self._movedItems = {id(item) : item}                            
+                        else:
+                            self.connect_arrow_by_control_point(self.items(event.scenePos()))
+            elif event.button() == Qt.RightButton and \
+                 QApplication.keyboardModifiers() & Qt.ControlModifier:
+                if self._controlPoint:
+                    self.end_placing_control_point()
+                else:
+                    if item:
+                        if item is not self._editText:
+                            self.start_drag_items(item, event)
                 
         if self._editText and self._editText is not item:
             self.done_editing_text()
