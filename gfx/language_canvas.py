@@ -18,14 +18,15 @@ from gfx.graphics_shape import GraphicsShape
 from gfx.deletable import Deletable
 from dialog.color_dialog import ColorDialog
 from bidict import bidict
+import re
 
 class LanguageCanvas(QGraphicsScene):
     user_text_edited = pyqtSignal(Text)
     mouse_pressed = pyqtSignal(QPointF)
     set_definition_requested = pyqtSignal(QGraphicsItem)
     
-    init_object_text = '🌍'
-    init_arrow_text = '🚀'
+    init_object_text = '{@A}'
+    init_arrow_text = '{@a}'
     init_remark_text = "Remark"
     init_label_text = "Label"
     default_background_color = QColor(237, 255, 241)
@@ -50,6 +51,9 @@ class LanguageCanvas(QGraphicsScene):
         self.background_color_dialog.setCurrentColor(self.backgroundBrush().color())
         #self._doubleClickTimer = None
         self._variableIndices = bidict()
+        self._arrowText = self.init_arrow_text
+        self._objectText = self.init_object_text
+        self._labelText = self.init_label_text
 
     def __setstate__(self, data:dict):
         self.__init__()
@@ -60,6 +64,9 @@ class LanguageCanvas(QGraphicsScene):
         for item in data['items']:
             self.addItem(item)
         self._variableIndices = data['var indices']
+        self._arrowText = data['arrow text']
+        self._objectText = data['object text']
+        self._labelText = data['label text']
     
     def __getstate__(self):
         items = list(filter_out_descendents(self.items()))
@@ -70,6 +77,9 @@ class LanguageCanvas(QGraphicsScene):
             'items' : items,
             'color dialog' : self.background_color_dialog._getState({}),
             'var indices' : self.variable_indices,
+            'arrow text' : self._arrowText,
+            'object text' : self._objectText,
+            'label text' : self._labelText
         }
     
     def addItem(self, item:GraphicsShape):
@@ -101,7 +111,7 @@ class LanguageCanvas(QGraphicsScene):
                 
         elif window.language_edit_mode == window.TextMode:            
             if not isinstance(item, Text):
-                T = Text(html=self.init_label_text)
+                T = Text(html=self.label_text)
                 T.set_contained_in_bbox(contained=False)
                 self._addText(T, parent=item)
                 if item is None:
@@ -116,14 +126,14 @@ class LanguageCanvas(QGraphicsScene):
             if item is not None:
                 self.set_definition_requested.emit(item)
             else:
-                X = Object(self.init_object_text)    
+                X = Object(self.object_text)    
                 self._addObject(X) 
                 X.setPos(event.scenePos(), snap=True)
                 X.update() 
                 
         elif window.language_edit_mode == window.ArrowMode:
             if isinstance(item, ControlPoint):
-                X = Object(self.init_object_text)
+                X = Object(self.object_text)
                 parent = item.parentItem()
                 self._addObject(X, parent.parentItem())                
                 parent.set_at_point(item, X)    
@@ -135,9 +145,9 @@ class LanguageCanvas(QGraphicsScene):
                 self.end_placing_control_point()
                 X.update()
             else:                
-                f = Arrow(text=self.init_arrow_text)
+                f = Arrow(text=self.arrow_text)
                 if item is None:                
-                    X = Object(self.init_object_text)    
+                    X = Object(self.object_text)    
                     self._addObject(X) 
                     X.setPos(event.scenePos(), snap=True)
                     X.update()                    
@@ -164,6 +174,8 @@ class LanguageCanvas(QGraphicsScene):
         
     def _addText(self, T:Text, parent=None):
         from core.undo_cmd import AddText
+        if parent:
+            T.set_contained_in_bbox(False)
         self._undoStack.push(AddText(T, canvas=self, parent=parent))
             
     def undo_command(self):
@@ -228,7 +240,7 @@ class LanguageCanvas(QGraphicsScene):
                                         elif isinstance(item, Text):
                                             parent = item.parentItem()
                                             
-                                            if isinstance(parent, Object):
+                                            if isinstance(parent, Object) and item.contained_in_bbox:
                                                 self._movedItems[id(parent)] = parent
                                             
                                             elif item.flags() & item.ItemIsMovable:
@@ -238,7 +250,7 @@ class LanguageCanvas(QGraphicsScene):
                                 else:
                                     if isinstance(item, Text):
                                         parent = item.parentItem()
-                                        if isinstance(parent, Object):
+                                        if isinstance(parent, Object) and item.contained_in_bbox:
                                             item = parent
                                     self._movedItems = {id(item) : item}                            
                             if len(self._movedItems) == 1 and isinstance(list(self._movedItems.values())[0], Arrow):
@@ -483,3 +495,59 @@ class LanguageCanvas(QGraphicsScene):
     def variable_indices(self):
         print(self._variableIndices)
         return self._variableIndices
+    
+    @property
+    def object_text(self):
+        text, self._objectText = self.auto_index_text(self._objectText)
+        return text
+    
+    @property
+    def arrow_text(self):
+        text, self._arrowText = self.auto_index_text(self._arrowText)
+        return text
+    
+    @property
+    def label_text(self):
+        text, self._labelText = self.auto_index_text(self._labelText)
+        return text
+    
+    _autoIndexRegex = re.compile(r'{(?P<direc>-?)@(?P<index>.+)}')
+    
+    def auto_index_text(self, text:str) -> tuple:
+        auto_index = text
+        
+        for match in self._autoIndexRegex.finditer(text):
+            current_index = index = match.group('index')
+            direc = match.group('direc')
+            if direc == '-':
+                direc = -1
+            else:
+                direc = 1
+            try:
+                index = int(index)
+                index += direc
+                index = str(index)
+            except:
+                index = ord(index[0])
+                index += direc
+                index = chr(index)
+            if direc == -1:
+                direc = "-@"
+            else:
+                direc = "@"
+            next_index = f'{{{direc}{index}}}'
+            auto_index = auto_index.replace(match.group(), next_index)
+            text = text.replace(match.group(), current_index)
+        return text, auto_index
+    
+    def text(self, text:str, item=None):
+        parent = item.parentItem()
+        text, auto_text = self.auto_index_text(text)
+        if parent is None or (isinstance(item, Text) and not item.contained_in_bbox):
+            self._labelText = auto_text
+        elif isinstance(parent, Object):
+            self._objectText = auto_text
+        elif isinstance(parent, Arrow):
+            self._arrowText = auto_text
+        return text, auto_text
+            

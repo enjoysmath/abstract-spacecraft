@@ -28,7 +28,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
         Deletable.__init__(self)
         self._html = None
         if html is not None:            
-            self.setHtml(html)
+            self.set_source_text(html)
         self.setFlags(self.ItemIsFocusable | self.ItemSendsGeometryChanges | self.ItemIsSelectable)
         self.setTextInteractionFlags(self.default_interaction)
         self.setOpenExternalLinks(True)
@@ -37,7 +37,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
         self.setFont(QApplication.instance().font())
         self._center = self._bbox.center()
         self._restorePos = None
-        self._varTemplRegex = None
+        self._varTemplRegex = None        
         #self._doubleClickTimer = None
         
     def __setstate__(self, data:dict):
@@ -52,7 +52,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
         
     def __getstate__(self):
         return {
-            'html' : self._html,
+            'html' : self.toPlainText(),
             'flags' : int(self.flags()),
             'color' : self.defaultTextColor(),
             'pos' : self.pos(),
@@ -85,7 +85,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
             #window = QApplication.instance().topmost_main_window()
             #self._collisionSave = window.collision_enabled
             self.scene().set_edit_text(self)
-            self.setPlainText(self._html)            
+            self.setPlainText(self._sourceCode)            
             cursor = self.textCursor()
             cursor.select(cursor.Document)
             self.setTextCursor(cursor)            
@@ -136,7 +136,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
     def done_editing(self):
         self.setTextInteractionFlags(self.default_interaction)
         self._html = None
-        self.setHtml(self.toPlainText())
+        self.set_source_text(self.toPlainText())
         cursor = self.textCursor()
         cursor.movePosition(QTextCursor.End)
         self.setTextCursor(cursor)
@@ -155,10 +155,17 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
 
     def toHtml(self):
         return self._html
+    
+    def set_source_text(self, source:str):
+        scene = self.scene()
+        if scene:
+            text, auto_text = self.scene().text(source, self)
+            self.setHtml(text)
+        else:
+            self.setHtml(source)
         
     def setHtml(self, html:str):
         if self._html != html:
-            self._html = self.parse_user_text(html)
             super().setHtml(html)
             self.update()
             
@@ -228,11 +235,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
     def setFont(self, font):
         super().setFont(font)
         self.update()
-        
-    def parse_user_text(self, text:str):
-        self._varTemplRegex = VariableTemplateRegex(text)
-        print(self._varTemplRegex)
-        return text
+    
             
                 
         

@@ -41,6 +41,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.actionCloseWindow.triggered.connect(lambda b: self.remove_language_view())
         self.actionCloseEntireApp.triggered.connect(lambda b: QApplication.instance().quit())
         self.actionCloseWindow.triggered.connect(lambda b: self.close())
+        self.actionDeleteTab.triggered.connect(lambda b: self.remove_language_view(self.current_language_view()))
         self.actionBack.triggered.connect(lambda b: self.navigate_back())
         self.actionForward.triggered.connect(lambda b: self.navigate_forward())
         self.language_tabs.currentChanged.connect(self.language_view_tab_changed)
@@ -162,8 +163,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             else:
                 index = None            
             self._navigationPos = index
-            self.language_tabs.removeTab(self.language_tabs.indexOf(view))
-            view.scene().selectionChanged.disconnect()
+            self.language_tabs.removeTab(self.language_tabs.indexOf(view.parentWidget()))
+            try:
+                view.scene().selectionChanged.disconnect()
+            except:
+                pass
         
     def current_language_view(self):
         tab_widget = self.current_tab_widget
@@ -309,8 +313,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
     def closeEvent(self, event):
         app = QApplication.instance()
-        app.save_app_data()
-        app.quit()
+        app.remove_window(self)
         super().closeEvent(event)
         
     def mousePressEvent(self, event):

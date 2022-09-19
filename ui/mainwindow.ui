@@ -65,7 +65,7 @@
     <addaction name="actionSave"/>
     <addaction name="actionSaveAs"/>
     <addaction name="separator"/>
-    <addaction name="actionDelete_Tab"/>
+    <addaction name="actionDeleteTab"/>
     <addaction name="actionCloseWindow"/>
     <addaction name="actionCloseEntireApp"/>
    </widget>
@@ -410,7 +410,7 @@
     <string>Close Window</string>
    </property>
   </action>
-  <action name="actionDelete_Tab">
+  <action name="actionDeleteTab">
    <property name="text">
     <string>Delete Tab</string>
    </property>

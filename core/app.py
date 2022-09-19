@@ -38,6 +38,9 @@ class App(QApplication):
         self._windows.append(window)
         window.show()
         return window
+    
+    def remove_window(self, window:QMainWindow):
+        self._windows.remove(window)
         
     def setFont(self, font):
         super().setFont(font)
