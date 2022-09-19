@@ -129,3 +129,7 @@ class LanguageGfxView(QGraphicsView):
     def setParent(self, parent):
         super().setParent(parent)
         self.init_scene_rect()
+        
+    @property
+    def language_canvases(self):
+        return [self.scene()]

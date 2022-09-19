@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QApplication
 import _pickle as pickle
 from lang.networkx_tools import networkx_graph
 import networkx as nx
+from gfx.language_gfx_view import LanguageGfxView
+from gfx.logical_rule_view import LogicalRuleView
 
 class LibraryCompilerThread(QThread):
     
@@ -13,10 +15,15 @@ class LibraryCompilerThread(QThread):
         
     def run(self):
         app = QApplication.instance()
-        app.load_document_from 
-        for filename in self._filenames:
-            documents = app.documents_from_data_file(filename)
         
+        for filename in self._filenames:
+            documents = app.documents_from_app_data(filename)
+            
+            for document in documents:
+                canvases = document.language_canvases
+                for canvas in canvases:
+                    graph = networkx_graph(canvas.items())
+                    print(graph)
             #// graph = networkx_graph(view.scene().items())
             #// self._compiledGraph.add_nodes_from(graph.nodes())
             #// self._compiledGraph.add_edges_from(graph.edges())

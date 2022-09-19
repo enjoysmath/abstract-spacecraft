@@ -365,22 +365,8 @@ class ArrowStyle(QObject):
 
     def update_selection_path(self, points, pen_width):
         self._selectionPath.clear()
-
-        if self._isBezier:
-            tline = QLineF(points[0], points[1])
-            hline = QLineF(points[-2], points[-1])
-        else:
-            tline = hline = QLineF(points[0], points[-1])
-
-        v = tline.unitVector()
-        u = v.normalVector()
-        u = u.p2() - u.p1()
-        v = v.p2() - v.p1()
-        w = self._headWidth / 2 + pen_width/2
-        arcStart = points[0] - w*u
-        arcEnd = points[0] + w*u
-        self._selectionPath.moveTo(arcStart)
-        #self._selectionPath.arcTo(QRectF(0,0,w,w), 180, 0)
+        stroker = QPainterPathStroker(QPen(Qt.black, self.head_width))
+        self._selectionPath = stroker.createStroke(self.paint_path)
 
     @property
     def is_bezier(self):

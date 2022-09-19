@@ -170,7 +170,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         if tab_widget:
             return tab_widget.view_widget
-    
+
     def language_views(self):
         for k in range(self.language_tabs.count()):
             yield self.language_tabs.widget(k).view_widget            

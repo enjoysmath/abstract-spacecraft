@@ -11,30 +11,37 @@ class VariableTemplateRegex:
             var_index = bidict()
 
         i = 0
-        var_count = 0
+        var_count = len(var_index)
         template = []
         self._regex = ''
-          
+        
+        def match_vars(string:str, i:int, start:int, var_count:int) ->  int:
+            var_end = i
+            for var_match in self._variableRegex.finditer(string[i:start]):
+                var_start, var_end = var_match.span()
+                text = string[i:var_start]
+                template.append(text)
+                var = var_match.group()
+                if var in var_index:
+                    index = var_index[var]
+                else:
+                    index = var_count
+                    var_index[var] = index
+                    var_count += 1
+                template.append(f'(?P<V{index}>.+)')            
+            return var_end, var_count
+        
         for match in self._textRegex.finditer(string):
             start,end = match.span()
-            for var_match in self._variableRegex.finditer(string[i:start]):
-                template.append((self.Variable, var_match.group()))
+            var_end, var_count = match_vars(string, i, start, var_count)
+            if var_end < start:
+                template.append(string[var_end:start])
             template.append(match.group())
             i = end
-        
-        for var_match in self._variableRegex.finditer(string[i:]):
-            var = var_match.group()
-            if var in var_index:
-                index = var_index[var]
-            else:
-                index = var_count
-                var_index[var] = index
-                var_count += 1
-            template.append(f'(?P<V{var_count}>.+)')
-            i = var_match.span()[1]
-        
-        ending = string[i:]
-        template.append(ending)
+
+        var_end, var_count = match_vars(string, i, len(string), var_count)
+        if var_end < len(string):
+            template.append(string[var_end:])
             
         self._regex = "".join(template)
         

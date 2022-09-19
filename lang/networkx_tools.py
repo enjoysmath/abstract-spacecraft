@@ -55,52 +55,65 @@ def regex_multiedge_match(datasets1, datasets2):
     return False
         
         
-def networkx_graph(items):        
+def networkx_graph(items, var_index:bidict=None):        
+    if var_index is None:
+        var_index = bidict()
     node_id = 0
     nodes = {}
-    arrows = []
     graph = nx.Graph()
-    
+
     for item in items:
-        if isinstance(item, (Object, Arrow)):
+        if isinstance(item, Object):
             item.networkx_node_id = node_id
             nodes[id(item)] = item
-            graph.add_node(node_id, **networkx_attributes(item))
+            graph.add_node(node_id, **networkx_attributes(item, var_index)) 
             node_id += 1
+        
+    for item in items:
+        if isinstance(item, Arrow):
+            item.networkx_node_id = node_id
+            nodes[id(item)] = item
+            graph.add_node(node_id, **networkx_attributes(item, var_index)) 
+            node_id += 1
+            if item.source:
+                graph.add_edge(item.source.networkx_node_id, node_id)
+            if item.destination:
+                graph.add_edge(node_id, item.destination.networkx_node_id)
             
-            if item.parentItem() is not None:
-                parent_arrow = ParentArrow(item, item.parentItem())
-                arrows.append(parent_arrow)
+        elif isinstance(item, Text):
+            if item.parentItem() is None:
+                item.networkx_node_id = node_id
+                nodes[id(item)] = item
+                graph.add_node(node_id, **networkx_attributes(item, var_index)) 
+                node_id += 1
             
-            if isinstance(item, Arrow):
-                arrows.append(item)
-                
-    for arrow in arrows:
-        if isinstance(arrow, ParentArrow):
-            graph.add_edge(nodes[id(arrow.source)], nodes[id(arrow.destination)], tofromparent='p')
-        else:
-            graph.add_edge(nodes[id(arrow)], nodes[id(arrow.destination)], tofromparent='t')
-            graph.add_edge(nodes[id(arrow)], nodes[id(arrow.source)], tofromparent='f')
-    
+    print(var_index)
     return graph
 
 
-def networkx_attributes(item):
+def networkx_attributes(item, var_index:bidict):
     if isinstance(item, Object):
-        kind = 0
+        return {
+            'kind': 'ob',
+            'labels' : networkx_labels(item, var_index),
+            'canvas' : item.scene(),
+        }
+    
     elif isinstance(item, Arrow):
-        kind = 1
+        return {
+            'kind' : 'arrow',
+            'labels' : networkx_labels(item, var_index),
+            'canvas' : item.scene(),
+        }
+    
     return {
-        'kind' : kind,
-        'labels' : networkx_labels(item)
+        'canvas' : item.scene(),
     }
     
     
-def networkx_labels(item):
+def networkx_labels(item, var_index:bidict):
     assert isinstance(item, (Object, Arrow))
-    labels = [VariableTemplateRegex(t.toHtml()) for t in \
-              filter(lambda c: isinstance(c, Text), item.childItems())]
-    #print(labels)
+    labels = [VariableTemplateRegex(t.toHtml(), var_index) for t in filter(lambda c: isinstance(c, Text), item.childItems())]
     return labels        
 
 

@@ -146,6 +146,15 @@ class LogicalRuleView(QWidget, Ui_LogicalRuleView):
       if self._proof is not None:
          window = self._proof.window()
          window.set_current_language_view(self._proof)
+         
+   @property
+   def language_canvases(self):
+      canvases = []
+      for given in self._givens.values():
+         canvases += given.language_canvases
+      for result in self._results.values():
+         canvases += result.languager_canvases
+      return canvases
       
    
    

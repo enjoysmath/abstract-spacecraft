@@ -215,6 +215,8 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
     
     def is_single_node_and_label(self):
         parent = self.parentItem()
+        if not parent:
+            return False
         siblings = parent.childItems()
         if not siblings:
             return False

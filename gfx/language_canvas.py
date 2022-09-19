@@ -241,6 +241,8 @@ class LanguageCanvas(QGraphicsScene):
                                         if isinstance(parent, Object):
                                             item = parent
                                     self._movedItems = {id(item) : item}                            
+                            if len(self._movedItems) == 1 and isinstance(list(self._movedItems.values())[0], Arrow):
+                                self._movedItems.clear()
                         else:
                             self.connect_arrow_by_control_point(self.items(event.scenePos()))
             elif event.button() == Qt.RightButton and \

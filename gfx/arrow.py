@@ -640,7 +640,7 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
         
     def paint(self, painter, option, widget):
         if self.isSelected() and self.scene():
-            paint_selection_shape(painter, self._selectionPath, self.transform(),
+            paint_selection_shape(painter, self.arrow_style.selection_path, self.transform(),
                                   self.transformations(), self.scene().backgroundBrush().color())
         shape = self.arrow_style.paint_path
         if shape:

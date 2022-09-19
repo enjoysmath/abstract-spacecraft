@@ -131,27 +131,20 @@ class App(QApplication):
             self.save_app_data(filename)
             self._appDataPath = filename
             
-    def documents_from_app_data(self, filname):
-        status_msg = "Ready."
-        
+    def documents_from_app_data(self, filename):        
         try:        
-            with open(self.last_session, "rb") as file:
-                last_project_path = pickle.load(file)
-                
-            if not os.path.exists(last_project_path):
-                raise FileNotFoundError(f"The project at '{last_project_path}' no longer exists. Loading blank window.")
+            documents = []
             
-            with open(last_project_path, "rb") as file:
+            with open(filename, "rb") as file:
                 data = pickle.load(file)
-                self.load_app_pickle(data)
-                self._appDataPath = last_project_path
-                self.set_saved()
-    
+                for window in data['windows']:
+                    documents += list(window.language_views())
+            
+            return documents
+        
         except Exception as excep:
-            status_msg = str(excep)
-            self.add_new_window()
-            self.set_saved(False)
-                
+            raise excep
+        
     def quit(self):
         if not self._quit:
             self.save_last_session()
