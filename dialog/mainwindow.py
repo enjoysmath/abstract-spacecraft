@@ -13,10 +13,12 @@ from gfx.object import Object
 from gfx.arrow import Arrow
 from gfx.text import Text
 from gfx.logical_rule_view import LogicalRuleView
+from gfx.proof_view import ProofView
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     new_tab_base_name = '🌌'
     set_query_wait_millisecs = 750
+    _lastActiveWindow = None
     
     DefinitionMode, TextMode, ArrowMode, MoveMode, NumEditModes = range(5)
     
@@ -34,7 +36,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionZoom_In.triggered.connect(lambda b: self.zoom_in_view())
         self.actionZoom_Out.triggered.connect(lambda b: self.zoom_out_view())
         self.actionNewWindow.triggered.connect(lambda b: QApplication.instance().add_new_window())
-        self.actionNewFreeDrawing.triggered.connect(lambda b: self.add_new_free_drawing_view())
+        self.actionNewDiagram.triggered.connect(lambda b: self.add_new_diagram_view())
         self.actionNewLogicalRule.triggered.connect(lambda b: self.add_new_logical_rule_view())
         #self.actionCloseWindow.triggered.connect(lambda b: self.remove_language_view())
         self.actionCloseEntireApp.triggered.connect(lambda b: QApplication.instance().quit())
@@ -72,6 +74,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._cassetteButtonGroup.setExclusive(True)
         self._cassetteButtonGroup.triggered.connect(self.edit_mode_button_triggered)
         self._editMode = self.ArrowMode
+        self.setMouseTracking(True)
+        MainWindow._lastActiveWindow = self
 
     _windowStatesEnum = {
         0x00000000 : Qt.WindowNoState,          #		The window has no state set (in normal state).
@@ -208,7 +212,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if view:
             view.zoom_out()
             
-    def add_new_free_drawing_view(self):
+    def add_new_diagram_view(self):
         canvas = LanguageCanvas()
         canvas.user_text_edited.connect(self.process_user_edited_text_item)
         view = LanguageGfxView(canvas)           
@@ -219,6 +223,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._newTabCount += 1
         canvas.selectionChanged.connect(lambda: self.set_selected_items_as_query(view))
         return view
+    
+    def add_new_proof_view(self, statement:LogicalRuleView, title:str=None):
+        proof_view = ProofView(statement)
+        if tab_name is None:
+            tab_name = self.new_tab_base_name + str(self._newTabCount)
+            self._newTabCount += 1
+        proof_view.set_tab_name(tab_name)
+        self.add_language_view(proof_view)
+        return proof_view
     
     def add_new_logical_rule_view(self):
         rule_view = LogicalRuleView()
@@ -299,3 +312,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         app.save_app_data()
         app.quit()
         super().closeEvent(event)
+        
+    def mousePressEvent(self, event):
+        MainWindow._lastActiveWindow = self
+        super().mousePressEvent(event)
+        
+    @property
+    def last_active_window(self):
+        return MainWindow._lastActiveWindow
+    
+    

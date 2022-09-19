@@ -56,9 +56,9 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="actionNewProof"/>
+    <addaction name="actionNewDiagram"/>
     <addaction name="actionNewLogicalRule"/>
-    <addaction name="actionNewFreeDrawing"/>
+    <addaction name="actionNewProof"/>
     <addaction name="actionNewWindow"/>
     <addaction name="separator"/>
     <addaction name="actionOpen"/>
@@ -176,9 +176,9 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionNewFreeDrawing">
+  <action name="actionNewDiagram">
    <property name="text">
-    <string>New Free Drawing</string>
+    <string>New Diagram</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>

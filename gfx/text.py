@@ -63,11 +63,11 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
         }
                         
     def update(self):
-        window = QApplication.instance().topmost_main_window()
+        window = QApplication.instance().topmost_main_window
         if not window:
             return
-        if window.text_collision_response_enabled:
-            self.bbox_collision_response()
+        #if window.text_collision_response_enabled:
+            #self.bbox_collision_response()
         Containable.update(self)
         super().update()
         #parent = self.parentItem()

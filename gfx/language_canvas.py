@@ -271,7 +271,7 @@ class LanguageCanvas(QGraphicsScene):
                 self.connect_arrow_by_control_point(self.items(event.scenePos()))
             else:
                 self.end_placing_control_point()
-            QApplication.instance().topmost_main_window().set_collision_response_enabled(self._collisionResponseSave)
+            #QApplication.instance().topmost_main_window.set_collision_response_enabled(self._collisionResponseSave)
         elif self._movedItems:
             from core.undo_cmd import MoveItems
             move_items = list(self._movedItems.values())
@@ -304,7 +304,7 @@ class LanguageCanvas(QGraphicsScene):
         drag.setMimeData(mimeData)
         drag.setHotSpot(event.screenPos())
 
-        QApplication.instance().topmost_main_window().stash_and_disable_collision_response()        
+        #QApplication.instance().topmost_main_window.stash_and_disable_collision_response()        
         
         if QApplication.keyboardModifiers() & Qt.ControlModifier:
             mimeData.drag_action = Qt.CopyAction
@@ -361,7 +361,7 @@ class LanguageCanvas(QGraphicsScene):
             if isinstance(item, Arrow):
                 item.update()
                 
-        QApplication.instance().topmost_main_window().restore_collision_response_setting()
+        #QApplication.instance().topmost_main_window.restore_collision_response_setting()
                        
     @staticmethod
     def pickle_items(items:list):
@@ -381,9 +381,9 @@ class LanguageCanvas(QGraphicsScene):
         return items
             
     def place_control_point(self, ctrl_point, skip_release=False):
-        window = QApplication.instance().topmost_main_window()
-        self._collisionResponseSave = window.collision_response_enabled
-        window.set_collision_response_enabled(False)        
+        window = QApplication.instance().topmost_main_window
+        #self._collisionResponseSave = window.collision_response_enabled
+        #window.set_collision_response_enabled(False)        
         if ctrl_point.parentItem():
             ctrl_point.parentItem().set_at_point(ctrl_point, None)
             self._controlPoint = ctrl_point
@@ -467,7 +467,7 @@ class LanguageCanvas(QGraphicsScene):
             point = self._controlPoint
             self._controlPoint = None
             self._controlPointSkip1Release = False
-            QApplication.instance().topmost_main_window().set_collision_response_enabled(self._collisionResponseSave)
+            #QApplication.instance().topmost_main_window().set_collision_response_enabled(self._collisionResponseSave)
             point.parentItem().update()
             
     @property

@@ -7,7 +7,7 @@ last_session = 'last_session_pickle.pickle'
 if __name__ == '__main__':
     app = App([])
     app.setFont(QFont(app.font().family(), 12))
-    app.setStyle('fusion')  # TODO remove or put as option / what are other styles?
+    app.setStyle('macintosh')  # TODO remove or put as option / what are other styles?
     
     app.load_last_session_or_blank()
     

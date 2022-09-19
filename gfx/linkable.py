@@ -19,7 +19,7 @@ class Linkable:
         menu.addAction('Set definition').triggered.connect(lambda b: self.user_navigates_to_link())
         
     def user_navigates_to_link(self):
-        QApplication.instance().show_set_definition_dialog(linkable=self)
+        QApplication.instance().set_link_requester(linkable=self)
                     
     def goto_link(self):
         from gfx.language_gfx_view import LanguageGfxView

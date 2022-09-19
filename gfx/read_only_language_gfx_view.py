@@ -5,6 +5,8 @@ class ReadOnlyLanguageGfxView(LanguageGfxView):
    def __init__(self, canvas:LanguageCanvas):
       super().__init__(canvas)
       self.fit_contents_in_view()
+      self.setMinimumHeight(0)
+      self.setMinimumWidth(0)      
       
    def mousePressEvent(self, event):
       event.accept()

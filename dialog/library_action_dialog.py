@@ -16,8 +16,7 @@ class LibraryActionDialog(QDialog, Ui_LibraryActionDialog):
    def new_diagram_button_clicked(self):
       parent = self.parentWidget()
       assert isinstance(parent, MainWindow)
-      
-      view = parent.add_new_free_drawing_view()
+      view = parent.add_new_diagram_view()
       
       
       

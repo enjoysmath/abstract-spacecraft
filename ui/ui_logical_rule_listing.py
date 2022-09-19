@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_LogicalRuleListing(object):
     def setupUi(self, LogicalRuleListing):
         LogicalRuleListing.setObjectName("LogicalRuleListing")
-        LogicalRuleListing.resize(468, 350)
+        LogicalRuleListing.resize(247, 367)
         self.gridLayout = QtWidgets.QGridLayout(LogicalRuleListing)
         self.gridLayout.setObjectName("gridLayout")
         self.ruleTitleLabel = QtWidgets.QLabel(LogicalRuleListing)
@@ -46,7 +46,7 @@ class Ui_LogicalRuleListing(object):
         self.givensScroll.setWidgetResizable(True)
         self.givensScroll.setObjectName("givensScroll")
         self.givensLayout = QtWidgets.QWidget()
-        self.givensLayout.setGeometry(QtCore.QRect(0, 0, 290, 274))
+        self.givensLayout.setGeometry(QtCore.QRect(0, 0, 69, 291))
         self.givensLayout.setObjectName("givensLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.givensLayout)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -56,7 +56,7 @@ class Ui_LogicalRuleListing(object):
         self.resultsScroll.setWidgetResizable(True)
         self.resultsScroll.setObjectName("resultsScroll")
         self.resultsLayout = QtWidgets.QWidget()
-        self.resultsLayout.setGeometry(QtCore.QRect(0, 0, 150, 274))
+        self.resultsLayout.setGeometry(QtCore.QRect(0, 0, 150, 291))
         self.resultsLayout.setObjectName("resultsLayout")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.resultsLayout)
         self.verticalLayout_2.setObjectName("verticalLayout_2")

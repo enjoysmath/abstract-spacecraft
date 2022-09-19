@@ -13,6 +13,7 @@ class LanguageGfxView(QGraphicsView):
         super().__init__(canvas)
         self._scale = (1.0, 1.0)
         self.setDragMode(self.RubberBandDrag)
+        self.setSceneRect(QRectF())
         #self.setAcceptDrops(True)
         self._wheelZoom = True
         self._zoomFactor = 1.25
@@ -22,6 +23,7 @@ class LanguageGfxView(QGraphicsView):
         self.init_scene_rect()
         self._name = None
         self._filename = None
+        self.setSizePolicy(self.sizePolicy().Policy.Minimum, self.sizePolicy().Policy.Minimum)
         
     def __setstate__(self, data:dict):
         self.__init__(data['canvas'])
@@ -58,11 +60,11 @@ class LanguageGfxView(QGraphicsView):
         self._name = name
         
     def init_scene_rect(self):
-        screen = QGuiApplication.primaryScreen()
+        screen = self.window()
         geometry = screen.geometry()
-        w = geometry.height()
-        h = geometry.width()
-        self.setSceneRect(0, 0, w, h)       
+        w = geometry.height() // 4
+        h = geometry.width() // 4           # BUGFIX: don't try this with actual screen or higher factors than this.
+        self.setSceneRect(0, 0, w, h)   
         
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
@@ -121,7 +123,9 @@ class LanguageGfxView(QGraphicsView):
         else:
             self.zoom_out(event.pos())
        
-    def fit_contents_in_view(self):
-        rect = self.scene().itemsBoundingRect()
-        if rect != QRectF():
-            self.setSceneRect(rect)
+    def fit_contents_in_view(self):                
+        self.setSceneRect(self.scene().itemsBoundingRect())
+        
+    def setParent(self, parent):
+        super().setParent(parent)
+        self.init_scene_rect()

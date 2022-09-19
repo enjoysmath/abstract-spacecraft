@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMainWindow
 from dialog.mainwindow import MainWindow
 from gfx.linkable import Linkable
 from PyQt5.QtCore import Qt
@@ -22,18 +22,16 @@ class App(QApplication):
         self._appDataPath = None
         self._saved = False
         self._quit = False
+        self._linkRequester = None
         
     def show_app_font_dialog(self):
         self._appFontDialog.exec_()
-        
-    def show_set_definition_dialog(self, linkable:Linkable):
-        self._setDefDialog.show(linkable)
-        
+
+    @property
     def topmost_main_window(self):
-        topLevel = self.topLevelWidgets()
-        for widget in topLevel:
-            if isinstance(widget, MainWindow):
-                return widget
+        if self._windows:
+            return self._windows[0].last_active_window
+        return None
         
     def add_new_window(self):
         window = MainWindow()
@@ -106,7 +104,7 @@ class App(QApplication):
     
     def load_app_data(self, filename:str=None):
         if filename is None:
-            filenames,_ = QFileDialog.getOpenFileNames(self.topmost_main_window(), 'Open Diagrams', './standard_library', 'Abstract Spacecraft (*.🌌)')
+            filenames,_ = QFileDialog.getOpenFileNames(self.topmost_main_window, 'Open Diagrams', './standard_library', 'Abstract Spacecraft (*.🌌)')
         for filename in filenames:            
             with open(filename, 'rb') as file:
                 data = pickle.load(file)
@@ -127,7 +125,7 @@ class App(QApplication):
             self.set_saved()
             
     def save_app_data_as(self):
-        filename,_ = QFileDialog.getSaveFileName(self.topmost_main_window(), 'Save Diagrams As', './standard_library', 'Abstract Spacecraft (*.🌌)')
+        filename,_ = QFileDialog.getSaveFileName(self.topmost_main_window, 'Save Diagrams As', './standard_library', 'Abstract Spacecraft (*.🌌)')
         
         if filename:
             self.save_app_data(filename)
@@ -173,3 +171,12 @@ class App(QApplication):
     
         except Exception as excep:
             raise excep      
+        
+    def set_link_requester(self, requester):
+        self._linkRequester = requester
+        if requester is not None:
+            self._setDefDialog.show()
+        
+    @property
+    def link_requester(self):
+        return self._linkRequester

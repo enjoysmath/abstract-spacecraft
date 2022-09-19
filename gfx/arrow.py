@@ -602,7 +602,7 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
-        window = QApplication.instance().topmost_main_window()
+        window = QApplication.instance().topmost_main_window
         if self.scene() and window.language_edit_mode in (window.ArrowMode, window.MoveMode):            
             if self._editTimer:
                 self._editTimer.stop()
