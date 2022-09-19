@@ -63,7 +63,7 @@ class Arrow(GraphicsShape, Connector, Bounded, DragDroppable, Containable, HasCo
         self._headPath = QPainterPath()
         self._linePath = QPainterPath()
         self.setAcceptHoverEvents(True)
-        self.setFlags(self.ItemIsFocusable | self.ItemSendsScenePositionChanges \
+        self.setFlags(self.ItemIsFocusable | self.ItemIsSelectable | self.ItemSendsScenePositionChanges \
                       | self.ItemSendsGeometryChanges)
         self.setFlag(self.ItemIsMovable, False)
         #self.setFiltersChildEvents(True)

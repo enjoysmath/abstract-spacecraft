@@ -10,6 +10,7 @@ from core.qt_tools import unpickle_gfx_item_flags
 from gfx.deletable import Deletable
 from gfx.has_context_menu import HasContextMenu
 import gfx.container
+from core.variable_template_regex import VariableTemplateRegex
 
 class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, Linkable, 
            Snappable, HasContextMenu, Deletable):
@@ -36,6 +37,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
         self.setFont(QApplication.instance().font())
         self._center = self._bbox.center()
         self._restorePos = None
+        self._varTemplRegex = None
         #self._doubleClickTimer = None
         
     def __setstate__(self, data:dict):
@@ -92,7 +94,6 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
             self.setFocus()            
                     
     def keyPressEvent(self, event):
-        self.parse_user_text()
         super().keyPressEvent(event)
         
     def mousePressEvent(self, event):
@@ -157,7 +158,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
         
     def setHtml(self, html:str):
         if self._html != html:
-            self._html = html
+            self._html = self.parse_user_text(html)
             super().setHtml(html)
             self.update()
             
@@ -226,10 +227,11 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
         super().setFont(font)
         self.update()
         
-    def parse_user_text(self):
-        scene = self.scene()
-        if scene:
-            scene.parse_user_text(text=self)
+    def parse_user_text(self, text:str):
+        self._varTemplRegex = VariableTemplateRegex(text)
+        print(self._varTemplRegex)
+        return text
+            
                 
         
         

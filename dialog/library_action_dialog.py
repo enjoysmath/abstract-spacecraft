@@ -17,7 +17,7 @@ class LibraryActionDialog(QDialog, Ui_LibraryActionDialog):
       parent = self.parentWidget()
       assert isinstance(parent, MainWindow)
       
-      view = parent.add_new_language_view()
+      view = parent.add_new_free_drawing_view()
       
       
       

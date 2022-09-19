@@ -12,6 +12,7 @@ from widget.debug_widget import DebugWidget
 from gfx.object import Object
 from gfx.arrow import Arrow
 from gfx.text import Text
+from gfx.logical_rule_view import LogicalRuleView
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     new_tab_base_name = '🌌'
@@ -33,7 +34,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionZoom_In.triggered.connect(lambda b: self.zoom_in_view())
         self.actionZoom_Out.triggered.connect(lambda b: self.zoom_out_view())
         self.actionNewWindow.triggered.connect(lambda b: QApplication.instance().add_new_window())
-        self.actionNewFreeDrawing.triggered.connect(lambda b: self.add_new_language_view())
+        self.actionNewFreeDrawing.triggered.connect(lambda b: self.add_new_free_drawing_view())
+        self.actionNewLogicalRule.triggered.connect(lambda b: self.add_new_logical_rule_view())
         #self.actionCloseWindow.triggered.connect(lambda b: self.remove_language_view())
         self.actionCloseEntireApp.triggered.connect(lambda b: QApplication.instance().quit())
         self.actionCloseWindow.triggered.connect(lambda b: self.close())
@@ -127,10 +129,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         widget.setLayout(QGridLayout())
         widget.layout().addWidget(view)
         widget.view_widget = view
-        self.language_tabs.addTab(widget,view.tab_name)
+        self.language_tabs.addTab(widget, view.tab_name)
         if self.language_tabs.count() > 1:
             self.language_tabs.setCurrentWidget(widget)
-        view.scene().selectionChanged.connect(lambda: self.set_selected_items_as_query(view))
         return view
     
     def set_selected_items_as_query(self, view):
@@ -207,16 +208,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if view:
             view.zoom_out()
             
-    def add_new_language_view(self):
+    def add_new_free_drawing_view(self):
         canvas = LanguageCanvas()
         canvas.user_text_edited.connect(self.process_user_edited_text_item)
         view = LanguageGfxView(canvas)           
         tabName = self.new_tab_base_name + str(self._newTabCount)
         view.set_tab_name(tabName)
         self.add_language_view(view)
-        self.language_tabs.show_tab_rename_dialog(self.language_tabs.count() - 1)
+        #self.language_tabs.show_tab_rename_dialog(self.language_tabs.count() - 1)
         self._newTabCount += 1
+        canvas.selectionChanged.connect(lambda: self.set_selected_items_as_query(view))
         return view
+    
+    def add_new_logical_rule_view(self):
+        rule_view = LogicalRuleView()
+        tabName = self.new_tab_base_name + str(self._newTabCount)
+        rule_view.set_tab_name(tabName)
+        self.add_language_view(rule_view)
+        self._newTabCount += 1 
+        return rule_view
         
     def navigate_back(self):
         if self._navigationPos is not None and self._navigationPos > 0:
@@ -231,8 +241,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toggle_enable_navigate_buttons()
         
     def toggle_enable_navigate_buttons(self):
-        self.actionBack.setEnabled(self._navigationPos > 0)
-        self.actionForward.setEnabled(self._navigationPos < len(self._navigationList) - 1)        
+        if self._navigationPos is not None:
+            self.actionBack.setEnabled(self._navigationPos > 0)
+            self.actionForward.setEnabled(self._navigationPos < len(self._navigationList) - 1)        
             
     def language_view_tab_changed(self, index:int):
         self.toggle_enable_navigate_buttons()

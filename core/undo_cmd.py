@@ -24,7 +24,7 @@ class AddObject(UndoCmd):
             self._ob.setParentItem(self._parent)
         else:
             self._canvas.addItem(self._ob)
-        self._ob.bbox_collision_response()
+        #self._ob.bbox_collision_response()
                 
     def undo(self):
         self._canvas.removeItem(self._ob)
@@ -43,7 +43,7 @@ class AddText(UndoCmd):
             self._text.setParentItem(self._parent)
         else:
             self._canvas.addItem(self._text)
-        self._text.bbox_collision_response()
+        #self._text.bbox_collision_response()
                 
     def undo(self):
         self._canvas.removeItem(self._text)

@@ -17,6 +17,7 @@ from dialog.canvas_grid_dialog import CanvasGridDialog
 from gfx.graphics_shape import GraphicsShape
 from gfx.deletable import Deletable
 from dialog.color_dialog import ColorDialog
+from bidict import bidict
 
 class LanguageCanvas(QGraphicsScene):
     user_text_edited = pyqtSignal(Text)
@@ -48,6 +49,7 @@ class LanguageCanvas(QGraphicsScene):
         self.background_color_dialog.currentColorChanged.connect(lambda col: self.setBackgroundBrush(SimpleBrush(col)))
         self.background_color_dialog.setCurrentColor(self.backgroundBrush().color())
         #self._doubleClickTimer = None
+        self._variableIndices = bidict()
 
     def __setstate__(self, data:dict):
         self.__init__()
@@ -57,6 +59,7 @@ class LanguageCanvas(QGraphicsScene):
         self.background_color_dialog._setState(data['color dialog'])
         for item in data['items']:
             self.addItem(item)
+        self._variableIndices = data['var indices']
     
     def __getstate__(self):
         items = list(filter_out_descendents(self.items()))
@@ -66,6 +69,7 @@ class LanguageCanvas(QGraphicsScene):
             'grid dialog' : self.grid_dialog._getState({}),
             'items' : items,
             'color dialog' : self.background_color_dialog._getState({}),
+            'var indices' : self.variable_indices,
         }
     
     def addItem(self, item:GraphicsShape):
@@ -95,15 +99,18 @@ class LanguageCanvas(QGraphicsScene):
                     item.goto_link()
             event.accept()
                 
-        elif window.language_edit_mode == window.TextMode:
-            T = Text(html=self.init_label_text)
-            T.set_contained_in_bbox(contained=False)
-            self._addText(T, parent=item)
-            if item is None:
-                T.setPos(event.scenePos())
+        elif window.language_edit_mode == window.TextMode:            
+            if not isinstance(item, Text):
+                T = Text(html=self.init_label_text)
+                T.set_contained_in_bbox(contained=False)
+                self._addText(T, parent=item)
+                if item is None:
+                    T.setPos(event.scenePos())
+                else:
+                    T.setPos(item.mapFromScene(event.scenePos()))
+                T.update()    
             else:
-                T.setPos(item.mapFromScene(event.scenePos()))
-            T.update()    
+                super().mouseDoubleClickEvent(event)
             
         elif window.language_edit_mode == window.DefinitionMode:
             if item is not None:
@@ -469,3 +476,8 @@ class LanguageCanvas(QGraphicsScene):
 
     def parse_user_text(self, text:Text):
         self.user_text_edited.emit(text)
+        
+    @property
+    def variable_indices(self):
+        print(self._variableIndices)
+        return self._variableIndices

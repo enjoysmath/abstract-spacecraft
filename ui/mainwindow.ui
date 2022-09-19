@@ -57,6 +57,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionNewProof"/>
+    <addaction name="actionNewLogicalRule"/>
     <addaction name="actionNewFreeDrawing"/>
     <addaction name="actionNewWindow"/>
     <addaction name="separator"/>
@@ -417,6 +418,11 @@
   <action name="actionCloseEntireApp">
    <property name="text">
     <string>Close Entire App</string>
+   </property>
+  </action>
+  <action name="actionNewLogicalRule">
+   <property name="text">
+    <string>New Logical Rule</string>
    </property>
   </action>
  </widget>

@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QGraphicsView
 from PyQt5.QtGui import QGuiApplication, QTransform
-from PyQt5.QtCore import Qt, QPointF
+from PyQt5.QtCore import Qt, QPointF, QRectF
 from gfx.language_canvas import LanguageCanvas
 from gfx.object import Object
 from gfx.arrow import Arrow
@@ -121,3 +121,7 @@ class LanguageGfxView(QGraphicsView):
         else:
             self.zoom_out(event.pos())
        
+    def fit_contents_in_view(self):
+        rect = self.scene().itemsBoundingRect()
+        if rect != QRectF():
+            self.setSceneRect(rect)
