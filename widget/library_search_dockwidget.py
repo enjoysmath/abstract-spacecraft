@@ -1,6 +1,5 @@
 from ui.ui_library_search_dockwidget import Ui_LibrarySearchDockWidget
-from PyQt5.QtWidgets import (QDockWidget, QGridLayout, QLabel,
-                             QGraphicsView)
+from PyQt5.QtWidgets import (QDockWidget, QGridLayout, QLabel, QGraphicsView, QApplication)
 from PyQt5.QtCore import QRectF
 from gfx.language_canvas import LanguageCanvas
 from widget.file_system_tree_view import FileSystemTreeView
@@ -8,6 +7,7 @@ from core.library_compiler_thread import LibraryCompilerThread
 import _pickle as pickle
 from gfx.arrow import Arrow
 from core.qt_tools import filter_out_descendents
+from core.library_search_thread import LibrarySearchThread
 
 class LibrarySearchDockWidget(QDockWidget, Ui_LibrarySearchDockWidget):
     default_root_dir = 'std_lib'
@@ -26,29 +26,48 @@ class LibrarySearchDockWidget(QDockWidget, Ui_LibrarySearchDockWidget):
         self._queryView.scale(0.6, 0.6)
         query_layout.addWidget(self._queryView)
         self._compilerThread = None
+        self._searchThread = None
         self._queryItems = None
+        self.searchButton.setEnabled(False)
+        self.searchButton.clicked.connect(self.search_library)
     
     def compile_library(self):
         filenames = self._fileTreeView.model().list_all_checked_filenames()
         self._compilerThread = LibraryCompilerThread(filenames)
         self._compilerThread.start()
+        self._compilerThread.finished.connect(self.library_compilation_finished)
+        
+    def library_compilation_finished(self):
+        if self._compilerThread.compiled_graph:
+            self.searchButton.setEnabled(bool(self._queryItems))            
 
     def set_items_as_query(self, items, view):
-        items = list(filter_out_descendents(list(items)))
-        self._queryItems = items
-        items_copy = pickle.dumps(items)
-        items_copy = pickle.loads(items_copy)
-        scene = self._queryView.scene()
-        scene.clear()
-        scene.setBackgroundBrush(view.scene().backgroundBrush())
-        rect = QRectF()
-        for item in items_copy:
-            if isinstance(item, Arrow):
-                item.set_control_points_visible(False)            
-            scene.addItem(item)
-            rect = rect.united(item.mapToScene(item.boundingRect()).boundingRect())                    
-        scene.setSceneRect(rect)
-                       
+        if items:
+            items = list(filter_out_descendents(list(items)))
+            self._queryItems = items
+            items_copy = pickle.dumps(items)
+            items_copy = pickle.loads(items_copy)
+            scene = self._queryView.scene()
+            scene.clear()
+            scene.setBackgroundBrush(view.scene().backgroundBrush())
+            rect = QRectF()
+            for item in items_copy:
+                if isinstance(item, Arrow):
+                    item.set_control_points_visible(False)            
+                scene.addItem(item)
+                rect = rect.united(item.mapToScene(item.boundingRect()).boundingRect())                    
+            scene.setSceneRect(rect)
+            
+            if self._compilerThread and self._compilerThread.compiled_graph:
+                self.searchButton.setEnabled(True)
+        else:
+            self._queryItems = None
+            self.searchButton.setEnabled(False)
+        
+    def search_library(self):        
+        self._searchThread = LibrarySearchThread(self._queryItems, self._compilerThread.compiled_graph)
+        self._searchThread.run()
+                           
             
 class QueryPreviewCanvas(LanguageCanvas):
     def mousePressEvent(self, event):

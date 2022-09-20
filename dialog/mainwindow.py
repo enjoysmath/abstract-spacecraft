@@ -123,7 +123,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._baseTitle = title
             self.set_saved_title(data_filename=app.app_data_path, saved=app.is_saved())
                         
-    def add_language_view(self, view:LanguageGfxView):     
+    def add_language_view(self, view):     
         if self._navigationPos is None:
             self._navigationPos = 0
         else:
@@ -137,6 +137,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.language_tabs.addTab(widget, view.tab_name)
         if self.language_tabs.count() > 1:
             self.language_tabs.setCurrentWidget(widget)
+            
+        if isinstance(view, LanguageGfxView):
+            canvas = view.scene()
+            canvas.selectionChanged.connect(lambda: self.set_selected_items_as_query(view))
+            
         return view
     
     def set_selected_items_as_query(self, view):
@@ -225,7 +230,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.add_language_view(view)
         #self.language_tabs.show_tab_rename_dialog(self.language_tabs.count() - 1)
         self._newTabCount += 1
-        canvas.selectionChanged.connect(lambda: self.set_selected_items_as_query(view))
         return view
     
     def add_new_proof_view(self, statement:LogicalRuleView, title:str=None):
