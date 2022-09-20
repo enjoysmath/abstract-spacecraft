@@ -15,7 +15,7 @@ def regex_node_match(data1, data2):
     G2 is the query graph and data2['labels'] holds its list of labels.
     """    
     labels1 = data1['labels']
-    labels2 = data2['labels']
+    labels2 = data2['labels']        
     
     if len(labels1) != len(labels2):
         return False
@@ -24,7 +24,7 @@ def regex_node_match(data1, data2):
     
     for m in maps2to1:
         for i in range(len(m)):
-            if not re.match(m[i], labels2[i]):
+            if not m[i].regex.fullmatch(labels2[i]):
                 break
         else:
             return True
@@ -33,39 +33,42 @@ def regex_node_match(data1, data2):
 
 
 def regex_multiedge_match(datasets1, datasets2):
-    if len(datasets1) != len(datasets2):
-        return False
+    #if len(datasets1) != len(datasets2):
+        #return False
     
-    datasets2_list = datasets2.values()
+    #datasets2_list = datasets2.values()
     
-    dataset_maps2to1 = product(datasets1.values(), len(datasets2))
+    #dataset_maps2to1 = product(datasets1.values(), len(datasets2))
     
-    for m in dataset_maps2to1:
-        for i in range(len(m)):
-            data1 = m[i]
-            data2 = datasets2_list[i]
+    #for m in dataset_maps2to1:
+        #for i in range(len(m)):
+            #data1 = m[i]
+            #data2 = datasets2_list[i]
     
-            if not regex_node_match(data1, data2):
-                break
-        else:
-            return True
+            #if not regex_node_match(data1, data2):
+                #break
+        #else:
+            #return True
     
-    return False
+    # This works because our Arrows are represented as nodes in the graph and edges are two plain edges to connect respective nodes
+    return True    
         
         
-def networkx_graph(items, var_index:bidict=None, labels_fun=None):               
+def build_networkx_graph(graph:nx.MultiDiGraph, items, var_index:bidict=None, labels_fun=None, node_id:int=None):               
     if var_index is None:
         var_index = bidict()
         
-    node_id = 0
+    if node_id is None:
+        node_id = 0
+        
     nodes = {}
-    graph = nx.MultiDiGraph()
 
     # Establish all the nodes first, including Arrows in order to support arrow-to-arrow connections
     for item in items:
         if isinstance(item, (Object, Arrow)):
             nodes[id(item)] = node_id
-            graph.add_node(node_id, **networkx_attributes(item, var_index, labels_fun)) 
+            attrs = networkx_attributes(item, var_index, labels_fun)
+            graph.add_node(node_id, **attrs) 
             node_id += 1
         
     # Connect the "arrows" and finally add in orphan Text items
@@ -78,10 +81,11 @@ def networkx_graph(items, var_index:bidict=None, labels_fun=None):
             
         elif isinstance(item, Text):
             if item.parentItem() is None:
-                graph.add_node(node_id, **networkx_attributes(item, var_index, labels_fun)) 
+                attrs = networkx_attributes(item, var_index, labels_fun)
+                graph.add_node(node_id, **attrs) 
                 node_id += 1
             
-    return graph
+    return node_id
    
 
 def networkx_attributes(item, var_index:bidict=None, labels_fun=None):
@@ -92,20 +96,22 @@ def networkx_attributes(item, var_index:bidict=None, labels_fun=None):
         return {
             'kind': 'object',
             'labels' : labels_fun(item, var_index),
-            'canvas' : item.scene(),
+            'gfxitem' : item,
         }
     
     elif isinstance(item, Arrow):
         return {
             'kind' : 'arrow',
             'labels' : labels_fun(item, var_index),
-            'canvas' : item.scene(),
+            'gfxitem' : item,
         }
     
-    return {
-        'kind' : 'remark',
-        'canvas' : item.scene(),
-    }
+    elif isinstance(item, Text):
+        return {
+            'kind' : 'remark',
+            'gfxitem' : item,
+            'labels' : [item.toHtml()],
+        }
 
     
 def networkx_library_labels(item, var_index:bidict=None):
@@ -116,3 +122,6 @@ def networkx_query_labels(item, var_index:bidict=None):
     labels = [t.toHtml() for t in filter(lambda x: isinstance(x, Text), item.childItems())]
     return labels
 
+def networkx_component_induced_by_node(G, node):
+    nodes = nx.single_source_shortest_path(G,node).keys()
+    return G.subgraph(nodes)

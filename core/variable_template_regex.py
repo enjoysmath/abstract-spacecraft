@@ -43,7 +43,7 @@ class VariableTemplateRegex:
         if var_end < len(string):
             template.append(string[var_end:])
             
-        self._regex = "".join(template)
+        self._regex = re.compile("".join(template))
         
     def __str__(self):
         return str(self._regex)
@@ -51,3 +51,6 @@ class VariableTemplateRegex:
     def __repr__(self):
         return str(self)
         
+    @property
+    def regex(self):
+        return self._regex

@@ -8,6 +8,8 @@ import _pickle as pickle
 from gfx.arrow import Arrow
 from core.qt_tools import filter_out_descendents
 from core.library_search_thread import LibrarySearchThread
+from gfx.language_gfx_view import LanguageGfxView
+from gfx.diagram_listing import DiagramListing
 
 class LibrarySearchDockWidget(QDockWidget, Ui_LibrarySearchDockWidget):
     default_root_dir = 'std_lib'
@@ -60,13 +62,31 @@ class LibrarySearchDockWidget(QDockWidget, Ui_LibrarySearchDockWidget):
             
             if self._compilerThread and self._compilerThread.compiled_graph:
                 self.searchButton.setEnabled(True)
+                
+            self.tabWidget.setCurrentWidget(self.queryDiagramTab)
         else:
             self._queryItems = None
             self.searchButton.setEnabled(False)
         
-    def search_library(self):        
+    def search_library(self):     
+        self.tabWidget.setCurrentWidget(self.searchResultsTab)
         self._searchThread = LibrarySearchThread(self._queryItems, self._compilerThread.compiled_graph)
+        self._searchThread.isomorphic_subgraph_match_found.connect(self.subgraph_match_found)
         self._searchThread.run()
+        
+    def subgraph_match_found(self, match:dict):
+        lib_graph = self._searchThread.library_graph
+        #query_graph = self._searchThread.query_graph
+        
+        for lib_node_id in match:
+            item = lib_graph.nodes[lib_node_id]['gfxitem']
+            diagram_view = item.scene().views()[0]
+            self.add_search_result_listing(diagram_view)
+            break
+        
+    def add_search_result_listing(self, view:LanguageGfxView):
+        listing = DiagramListing(view)
+        self.searchResultsLayout.layout().addWidget(listing)
                            
             
 class QueryPreviewCanvas(LanguageCanvas):
