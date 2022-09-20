@@ -9,7 +9,6 @@ from gfx.read_only_language_gfx_view import ReadOnlyLanguageGfxView
 
 class DiagramListing(LanguageListing, Ui_DiagramListing):
    refresh_wait_interval_ms = 1500
-   remove_requested = pyqtSignal()
    
    def __init__(self, diagram_view, parent=None):
       super().__init__(parent)
@@ -20,9 +19,18 @@ class DiagramListing(LanguageListing, Ui_DiagramListing):
       self.diagramView = ReadOnlyLanguageGfxView(scene_data)
       self.layout().addWidget(self.diagramView, 1, 0, -1, -1)
       self.diagramTitleLabel.setText(diagram_view.tab_name)
+      diagram_view.tab_name_changed.connect(self.diagramTitleLabel.setText)
       self._refreshTimer = None
       self.editButton.clicked.connect(self.navigate_to_diagram)
       self.removeButton.clicked.connect(self.remove_from_listing)
+      
+   def __setstate__(self, data):
+      self.__init__(data['source view'])
+      
+   def __getstate__(self):
+      return {
+         'source view' : self._sourceView
+      }
       
    def refresh_scene_data(self):
       if self._refreshTimer is None:
@@ -47,3 +55,5 @@ class DiagramListing(LanguageListing, Ui_DiagramListing):
    @property
    def source_view(self):
       return self._sourceView
+   
+   

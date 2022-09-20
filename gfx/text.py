@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QGraphicsTextItem, QMenu, QApplication
-from PyQt5.QtGui import QTextCursor, QColor
+from PyQt5.QtGui import QTextCursor, QColor, QFontMetrics
 from PyQt5.QtCore import Qt, QPointF, QRectF, QObject #QElapsedTimer
 from gfx.containable import Containable
 from gfx.collision_responsive import CollisionResponsive
@@ -85,7 +85,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
             #window = QApplication.instance().topmost_main_window()
             #self._collisionSave = window.collision_enabled
             self.scene().set_edit_text(self)
-            self.setPlainText(self._sourceCode)            
+            self.setPlainText(self._html)            
             cursor = self.textCursor()
             cursor.select(cursor.Document)
             self.setTextCursor(cursor)            
@@ -94,6 +94,12 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
             self.setFocus()            
                     
     def keyPressEvent(self, event):
+        font_metrics = QFontMetrics(self.font())
+        text = self.toPlainText()
+        w = font_metrics.width(text)
+        h = font_metrics.height()
+        self._bbox = QRectF(-w/2, -h/2, w, h)            
+        self.update()
         super().keyPressEvent(event)
         
     def mousePressEvent(self, event):
@@ -135,7 +141,6 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
 
     def done_editing(self):
         self.setTextInteractionFlags(self.default_interaction)
-        self._html = None
         self.set_source_text(self.toPlainText())
         cursor = self.textCursor()
         cursor.movePosition(QTextCursor.End)
@@ -166,6 +171,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
         
     def setHtml(self, html:str):
         if self._html != html:
+            self._html = html
             super().setHtml(html)
             self.update()
             

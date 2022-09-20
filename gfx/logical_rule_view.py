@@ -6,8 +6,11 @@ from gfx.diagram_listing import DiagramListing
 from PyQt5.QtWidgets import QMenu
 from collections import OrderedDict
 from gfx.external_link_listing import ExternalLinkListing
+from PyQt5.QtCore import pyqtSignal
 
 class LogicalRuleView(QWidget, Ui_LogicalRuleView):
+   tab_name_changed = pyqtSignal(str)
+   
    Idle, AddingGiven, AddingResult = range(3)
    
    def __init__(self, parent=None):
@@ -43,8 +46,10 @@ class LogicalRuleView(QWidget, Ui_LogicalRuleView):
    def tab_name(self):
       return self._tabName
    
-   def set_tab_name(self, name):
-      self._tabName = name
+   def set_tab_name(self, name:str):
+      if self._tabName != name:
+         self._tabName = name
+         self.tab_name_changed.emit(name)    
       
    def add_given(self, given=None):
       if given is None:
@@ -137,7 +142,7 @@ class LogicalRuleView(QWidget, Ui_LogicalRuleView):
          menu.addAction("Create Proof").triggered.connect(self.create_new_proof)
       else:
          menu.addAction("Goto Proof").triggered.connect(self.navigate_to_proof)
-      menu.exec_(event.screenPos())
+      menu.exec_(self.mapToGlobal(event.pos()))
          
    def create_new_proof(self):
       self._proof = self.window().add_new_proof_view(statement=self, title=f"Proof. {self.tab_name}")
@@ -156,6 +161,13 @@ class LogicalRuleView(QWidget, Ui_LogicalRuleView):
          canvases += result.languager_canvases
       return canvases
       
-   
-   
-   
+   def set_font(self, font, memo:dict=None):
+      if memo is None:
+         memo = {}
+         
+      if id(self) not in memo:
+         memo[id(self)] = self      
+         for given in self._givens.values():
+            if isinstance(given, (LogicalRuleView, LanguageGfxView)):
+               given.setFont(font)
+            

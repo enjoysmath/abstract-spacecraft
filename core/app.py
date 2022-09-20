@@ -44,11 +44,10 @@ class App(QApplication):
         
     def setFont(self, font):
         super().setFont(font)
+        memo = {}
         for window in self._windows:
             for langView in window.language_views():
-                for item in langView.scene().items():
-                    if isinstance(item, Text):
-                        item.setFont(font)
+                langView.set_font(font, memo)
         self._appFontDialog.set_font(font)
         
     def load_app_pickle(self, data:dict):

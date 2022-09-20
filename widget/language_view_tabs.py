@@ -3,6 +3,7 @@ from dialog.diagram_name_dialog import DiagramNameDialog
 from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QMenu, QApplication
 from gfx.language_gfx_view import LanguageGfxView
+from gfx.logical_rule_view import LogicalRuleView
 
 class LanguageViewTabs(TabWidget):
     def __init__(self):
@@ -14,7 +15,9 @@ class LanguageViewTabs(TabWidget):
         result = dialog.exec_()
         
         if result == dialog.Accepted:
-            self.setTabText(tab_index, dialog.nameLineEdit.text())        
+            name = dialog.nameLineEdit.text()
+            self.setTabText(tab_index, name)   
+            self.language_view_widget(tab_index).set_tab_name(name)
             
     def show_tab_context_menu(self, screen_pos:QPoint):
         menu = QMenu()
@@ -29,7 +32,7 @@ class LanguageViewTabs(TabWidget):
         
     def language_view_widget(self, tab_index:int) -> LanguageGfxView:
         for child in self.widget(tab_index).children():
-            if isinstance(child, LanguageGfxView):
+            if isinstance(child, (LanguageGfxView, LogicalRuleView)):
                 return child
             
     def set_link_target(self, view):

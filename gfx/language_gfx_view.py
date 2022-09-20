@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QGraphicsView
 from PyQt5.QtGui import QGuiApplication, QTransform
-from PyQt5.QtCore import Qt, QPointF, QRectF
+from PyQt5.QtCore import Qt, QPointF, QRectF, pyqtSignal
 from gfx.language_canvas import LanguageCanvas
 from gfx.object import Object
 from gfx.arrow import Arrow
@@ -9,6 +9,8 @@ from gfx.text import Text
 from gfx.connectable import Connectable
 
 class LanguageGfxView(QGraphicsView):
+    tab_name_changed = pyqtSignal(str)
+    
     def __init__(self, canvas:LanguageCanvas):
         super().__init__(canvas)
         self._scale = (1.0, 1.0)
@@ -57,7 +59,9 @@ class LanguageGfxView(QGraphicsView):
         return self._name
     
     def set_tab_name(self, name:str):
-        self._name = name
+        if self._name != name:
+            self._name = name
+            self.tab_name_changed.emit(name)        
         
     def init_scene_rect(self):
         screen = self.window()
@@ -133,3 +137,14 @@ class LanguageGfxView(QGraphicsView):
     @property
     def language_canvases(self):
         return [self.scene()]
+    
+    def set_font(self, font, memo:dict=None):
+        if memo is None:
+            memo = {}
+            
+        if id(self) not in memo:
+            memo[id(self)] = self
+            
+            for item in self.scene().items():
+                if isinstance(item, Text):
+                    item.setFont(font)    

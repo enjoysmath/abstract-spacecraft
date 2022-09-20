@@ -363,7 +363,7 @@ class LanguageCanvas(QGraphicsScene):
         parent = self.itemAt(event.scenePos(), QTransform())
         if not isinstance(parent, Container):
             parent = None
-        from undo_cmd import DropItems
+        from core.undo_cmd import DropItems
         self._undoStack.push(DropItems(
             items, canvas=self, pos=event.scenePos(), move_action=False, parent=parent,
             source_items=mimeData.drag_items,
@@ -499,16 +499,22 @@ class LanguageCanvas(QGraphicsScene):
     @property
     def object_text(self):
         text, self._objectText = self.auto_index_text(self._objectText)
+        if not self._objectText:
+            self._objectText = self.init_object_text            
         return text
     
     @property
     def arrow_text(self):
         text, self._arrowText = self.auto_index_text(self._arrowText)
+        if not self._arrowText:
+            self._arrowText = self.init_arrow_text
         return text
     
     @property
     def label_text(self):
         text, self._labelText = self.auto_index_text(self._labelText)
+        if not self._labelText:
+            self._labelText = self.init_label_text
         return text
     
     _autoIndexRegex = re.compile(r'{(?P<direc>-?)@(?P<index>.+)}')
