@@ -10,7 +10,7 @@ from gfx.arrow import Arrow
 from core.qt_tools import filter_out_descendents
 
 class LibrarySearchDockWidget(QDockWidget, Ui_LibrarySearchDockWidget):
-    default_root_dir = 'standard_library'
+    default_root_dir = 'std_lib'
 
     def __init__(self):
         QDockWidget.__init__(self)

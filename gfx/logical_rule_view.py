@@ -158,7 +158,7 @@ class LogicalRuleView(QWidget, Ui_LogicalRuleView):
       for given in self._givens.values():
          canvases += given.language_canvases
       for result in self._results.values():
-         canvases += result.languager_canvases
+         canvases += result.language_canvases
       return canvases
       
    def set_font(self, font, memo:dict=None):

@@ -26,6 +26,10 @@ class App(QApplication):
         
     def show_app_font_dialog(self):
         self._appFontDialog.exec_()
+        
+    @property
+    def app_data_path(self):
+        return self._appDataPath
 
     @property
     def topmost_main_window(self):
@@ -41,6 +45,8 @@ class App(QApplication):
     
     def remove_window(self, window:QMainWindow):
         self._windows.remove(window)
+        if not self._windows:
+            self.quit()
         
     def setFont(self, font):
         super().setFont(font)
@@ -99,14 +105,14 @@ class App(QApplication):
             self._saved = saved
             
             for window in self._windows:
-                window.set_saved_title(saved)
+                window.set_saved_title(self.app_data_path, saved)
                 
     def is_saved(self):
         return self._saved
     
     def load_app_data(self, filename:str=None):
         if filename is None:
-            filenames,_ = QFileDialog.getOpenFileNames(self.topmost_main_window, 'Open Diagrams', './standard_library', 'Abstract Spacecraft (*.🌌)')
+            filenames,_ = QFileDialog.getOpenFileNames(self.topmost_main_window, 'Open Diagrams', './std_lib', 'Abstract Spacecraft (*.🌌)')
         for filename in filenames:            
             with open(filename, 'rb') as file:
                 data = pickle.load(file)
@@ -127,7 +133,7 @@ class App(QApplication):
             self.set_saved()
             
     def save_app_data_as(self):
-        filename,_ = QFileDialog.getSaveFileName(self.topmost_main_window, 'Save Diagrams As', './standard_library', 'Abstract Spacecraft (*.🌌)')
+        filename,_ = QFileDialog.getSaveFileName(self.topmost_main_window, 'Save Diagrams As', './std_lib', 'Abstract Spacecraft (*.🌌)')
         
         if filename:
             self.save_app_data(filename)

@@ -64,10 +64,11 @@ class LanguageGfxView(QGraphicsView):
             self.tab_name_changed.emit(name)        
         
     def init_scene_rect(self):
-        screen = self.window()
+        # BUGFIX: can't mess with this otherwise zoom won't work, also too big and the window can't be made smaller
+        screen = self.screen()
         geometry = screen.geometry()
-        w = geometry.height() // 4
-        h = geometry.width() // 4           # BUGFIX: don't try this with actual screen or higher factors than this.
+        w = geometry.height() 
+        h = geometry.width()            
         self.setSceneRect(0, 0, w, h)   
         
     def mousePressEvent(self, event):

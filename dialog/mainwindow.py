@@ -114,14 +114,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def language_edit_mode(self):
         return self._editMode
         
-    def set_saved_title(self, saved:bool=True):
-        add = ' *' if not saved else ''
-        super().setWindowTitle(self._baseTitle + add)
+    def set_saved_title(self, data_filename:str, saved:bool=True):
+        super().setWindowTitle(f"{self._baseTitle} - {data_filename} {'*' if not saved else ''}")
         
     def setWindowTitle(self, title:str):
+        app = QApplication.instance()
         if self._baseTitle != title:
             self._baseTitle = title
-            self.set_saved_title(saved=QApplication.instance().is_saved())
+            self.set_saved_title(data_filename=app.app_data_path, saved=app.is_saved())
                         
     def add_language_view(self, view:LanguageGfxView):     
         if self._navigationPos is None:
