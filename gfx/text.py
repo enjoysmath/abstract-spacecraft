@@ -28,7 +28,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
         Deletable.__init__(self)
         self._html = None
         if html is not None:            
-            self.set_source_text(html)
+            self.setHtml(html)
         self.setFlags(self.ItemIsFocusable | self.ItemSendsGeometryChanges | self.ItemIsSelectable)
         self.setTextInteractionFlags(self.default_interaction)
         self.setOpenExternalLinks(True)
@@ -170,6 +170,8 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
             self.setHtml(source)
         
     def setHtml(self, html:str):
+        if html == 'b':
+            pass
         if self._html != html:
             self._html = html
             super().setHtml(html)

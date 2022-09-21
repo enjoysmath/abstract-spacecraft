@@ -34,10 +34,6 @@
    "value": false
   },
   {
-   "optionDest": "debug",
-   "value": "imports"
-  },
-  {
    "optionDest": "strip",
    "value": false
   },

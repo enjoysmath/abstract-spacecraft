@@ -15,13 +15,35 @@
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="2" column="1" colspan="3">
+     <widget class="QPushButton" name="searchButton">
+      <property name="minimumSize">
+       <size>
+        <width>40</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Search for what is selected in the current diagram view (see tabs).</string>
+      </property>
+      <property name="text">
+       <string>🔍 Search library</string>
+      </property>
+     </widget>
+    </item>
     <item row="1" column="1" colspan="3">
      <widget class="QTabWidget" name="tabWidget">
       <property name="tabPosition">
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="searchPathTab">
        <attribute name="title">
@@ -91,6 +113,24 @@
           </item>
          </widget>
         </item>
+        <item row="2" column="0" colspan="3">
+         <widget class="QScrollArea" name="searchResultsScroll">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="searchResultsLayout">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>400</width>
+             <height>299</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout"/>
+          </widget>
+         </widget>
+        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
@@ -101,33 +141,8 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0" colspan="3">
-         <layout class="QVBoxLayout" name="searchResultsLayout"/>
-        </item>
        </layout>
       </widget>
-     </widget>
-    </item>
-    <item row="2" column="1" colspan="3">
-     <widget class="QPushButton" name="searchButton">
-      <property name="minimumSize">
-       <size>
-        <width>40</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="toolTip">
-       <string>Search for what is selected in the current diagram view (see tabs).</string>
-      </property>
-      <property name="text">
-       <string>🔍 Search library</string>
-      </property>
      </widget>
     </item>
    </layout>

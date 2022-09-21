@@ -74,9 +74,9 @@ def build_networkx_graph(graph:nx.MultiDiGraph, items, var_index:bidict=None, la
     # Connect the "arrows" and finally add in orphan Text items
     for item in items:
         if isinstance(item, Arrow):
-            if item.source:
+            if item.source and id(item.source) in nodes:
                 graph.add_edge(nodes[id(item.source)], nodes[id(item)])
-            if item.destination:
+            if item.destination and id(item.destination) in nodes:
                 graph.add_edge(nodes[id(item)], nodes[id(item.destination)])
             
         elif isinstance(item, Text):

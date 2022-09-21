@@ -26,7 +26,7 @@ class LanguageCanvas(QGraphicsScene):
     set_definition_requested = pyqtSignal(QGraphicsItem)
     
     init_object_text = '{@A}'
-    init_arrow_text = '{@a}'
+    init_arrow_text = f'{{@{chr(ord("a") - 1)}}}'   # TEMPORARY HACKFIX, otherwise with 'a', arrows will start at 'b' for some strange reason.
     init_remark_text = "Remark"
     init_label_text = "Label"
     default_background_color = QColor(237, 255, 241)
@@ -360,14 +360,12 @@ class LanguageCanvas(QGraphicsScene):
     def dropEvent(self, event):
         mimeData = event.mimeData()
         items = self.unpickle_items(mimeData.data('application/octet-stream'))
-        parent = self.itemAt(event.scenePos(), QTransform())
-        if not isinstance(parent, Container):
-            parent = None
         from core.undo_cmd import DropItems
         self._undoStack.push(DropItems(
-            items, canvas=self, pos=event.scenePos(), move_action=False, parent=parent,
+            items, canvas=self, pos=event.scenePos(), move_action=False, parent=None,
             source_items=mimeData.drag_items,
             source_canvas=mimeData.drag_from_canvas))
+        
         #for item in items:
             #item.update()
             
