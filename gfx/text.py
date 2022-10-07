@@ -52,7 +52,7 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
         
     def __getstate__(self):
         return {
-            'html' : self.toPlainText(),
+            'html' : self.toHtml(),
             'flags' : int(self.flags()),
             'color' : self.defaultTextColor(),
             'pos' : self.pos(),
@@ -73,13 +73,11 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
         #parent = self.parentItem()
         
         #from gfx.arrow import Arrow        
-        #if parent:
-            #if isinstance(parent, Arrow):
-                #if parent.parentItem():
-                    #parent.parentItem().update()
-            #else:
-                #self.parentItem().update()        
+        parent = self.parentItem()
         
+        if parent:
+            parent.update()
+            
     def mouseDoubleClickEvent(self, event):
         if self.scene():       
             #window = QApplication.instance().topmost_main_window()
@@ -170,13 +168,10 @@ class Text(QGraphicsTextItem, Containable, CollisionResponsive, DragDroppable, L
             self.setHtml(source)
         
     def setHtml(self, html:str):
-        if html == 'b':
-            pass
-        if self._html != html:
-            self._html = html
-            super().setHtml(html)
-            self.update()
-            
+        self._html = html
+        super().setHtml(html)
+        self.update()
+        
     def itemChange(self, change, value):
         #if QApplication.instance().topmost_main_window().text_collision_response_enabled:
             #value = CollisionResponsive._itemChange(self, change, value)

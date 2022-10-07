@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QGraphicsView
 from PyQt5.QtGui import QGuiApplication, QTransform
-from PyQt5.QtCore import Qt, QPointF, QRectF, pyqtSignal
+from PyQt5.QtCore import Qt, QPointF, QRectF, pyqtSignal, QRect
 from gfx.language_canvas import LanguageCanvas
 from gfx.object import Object
 from gfx.arrow import Arrow
@@ -26,6 +26,7 @@ class LanguageGfxView(QGraphicsView):
         self._name = None
         self._filename = None
         self.setSizePolicy(self.sizePolicy().Policy.Minimum, self.sizePolicy().Policy.Minimum)
+        self.setAcceptDrops(True)
         
     def __setstate__(self, data:dict):
         self.__init__(data['canvas'])
@@ -67,9 +68,9 @@ class LanguageGfxView(QGraphicsView):
         # BUGFIX: can't mess with this otherwise zoom won't work, also too big and the window can't be made smaller
         screen = self.screen()
         geometry = screen.geometry()
-        w = geometry.height() 
-        h = geometry.width()            
-        self.setSceneRect(0, 0, w, h)   
+        w = geometry.height() / 4 
+        h = geometry.width() / 4       
+        self.setSceneRect(QRectF(-w/2, -h/2, w, h))
         
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
@@ -149,3 +150,15 @@ class LanguageGfxView(QGraphicsView):
             for item in self.scene().items():
                 if isinstance(item, Text):
                     item.setFont(font)    
+                    
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasFormat('application/octet-stream'):
+            event.accept()
+        else:
+            event.ignore()
+            
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasFormat('application/octet-stream'):
+            event.accept()
+        else:
+            event.ignore()    

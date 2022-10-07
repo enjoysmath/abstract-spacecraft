@@ -19,6 +19,7 @@ from gfx.deletable import Deletable
 from dialog.color_dialog import ColorDialog
 from bidict import bidict
 import re
+from core.unicode_tools import convert_unicode_scripts
 
 class LanguageCanvas(QGraphicsScene):
     user_text_edited = pyqtSignal(Text)
@@ -26,7 +27,7 @@ class LanguageCanvas(QGraphicsScene):
     set_definition_requested = pyqtSignal(QGraphicsItem)
     
     init_object_text = '{@A}'
-    init_arrow_text = f'{{@{chr(ord("a") - 1)}}}'   # TEMPORARY HACKFIX, otherwise with 'a', arrows will start at 'b' for some strange reason.
+    init_arrow_text = '{@a}' 
     init_remark_text = "Remark"
     init_label_text = "Label"
     default_background_color = QColor(237, 255, 241)
@@ -145,24 +146,26 @@ class LanguageCanvas(QGraphicsScene):
                 self.end_placing_control_point()
                 X.update()
             else:                
-                f = Arrow(text=self.arrow_text)
                 if item is None:                
                     X = Object(self.object_text)    
                     self._addObject(X) 
                     X.setPos(event.scenePos(), snap=True)
                     X.update()                    
+                elif isinstance(item, Text):
+                    super().mouseDoubleClickEvent(event)
                 else:
+                    f = Arrow(text=self.arrow_text)
                     if isinstance(item, Text) and window.edit_text_mode:
                         super().mouseDoubleClickEvent(event)
                         return                
                     item = first_ancestor_of_type(Connectable, item)
                     if item:
                         f.set_source(item)
-                    self._addArrow(f, parent=item.parentItem())
+                    self._addArrow(f)
                     f.destination_point.setPos(f.mapFromScene(event.scenePos())) 
                     self.place_control_point(f.destination_point, skip_release=True)                
-                f.source_point.setPos(f.mapFromScene(event.scenePos()))
-                f.update() 
+                    f.source_point.setPos(f.mapFromScene(event.scenePos()))
+                    f.update() 
                         
     def _addObject(self, X:Object, parent=None):
         from core.undo_cmd import AddObject
@@ -188,6 +191,13 @@ class LanguageCanvas(QGraphicsScene):
         from dialog.mainwindow import MainWindow
         window = QApplication.activeWindow()
         
+        if QApplication.keyboardModifiers() & Qt.ControlModifier:                
+            for view in self.views():
+                view.setDragMode(view.ScrollHandDrag)        
+        else:
+            for view in self.views():
+                view.setDragMode(view.RubberBandDrag)
+        
         if isinstance(window, MainWindow):
             delta = event.scenePos() - event.lastScenePos()
             
@@ -211,7 +221,15 @@ class LanguageCanvas(QGraphicsScene):
         window = QApplication.activeWindow()
         
         if window.language_edit_mode in (window.MoveMode, window.ArrowMode, window.TextMode):
-            if event.button() == Qt.LeftButton: 
+            if QApplication.keyboardModifiers() & Qt.ControlModifier:
+                if self._controlPoint:
+                    self.end_placing_control_point()
+                else:
+                    if item:
+                        if item is not self._editText:
+                            self.start_drag_items(item, event)            
+                            
+            elif event.button() == Qt.LeftButton: 
                 if item:
                     if item is not self._editText:   
                         if self._controlPoint is None:
@@ -257,14 +275,6 @@ class LanguageCanvas(QGraphicsScene):
                                 self._movedItems.clear()
                         else:
                             self.connect_arrow_by_control_point(self.items(event.scenePos()))
-            elif event.button() == Qt.RightButton and \
-                 QApplication.keyboardModifiers() & Qt.ControlModifier:
-                if self._controlPoint:
-                    self.end_placing_control_point()
-                else:
-                    if item:
-                        if item is not self._editText:
-                            self.start_drag_items(item, event)
                 
         if self._editText and self._editText is not item:
             self.done_editing_text()
@@ -297,7 +307,7 @@ class LanguageCanvas(QGraphicsScene):
             self._startPos = None
         super().mouseReleaseEvent(event)
         
-    def start_drag_items(self, item, event):        
+    def start_drag_items(self, item, event):         
         if item.isSelected():
             dragItems = self.selectedItems()
             dragItems = list(filter_out_descendents(dragItems))            
@@ -350,12 +360,6 @@ class LanguageCanvas(QGraphicsScene):
             self._undoStack.push(EditText(self._editText, before=self._textBeforeEdit))
             self._editText = None        
             self._textBeforeEdit = None
-
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasFormat('application/octet-stream'):
-            event.accept()
-        else:
-            event.ignore()
             
     def dropEvent(self, event):
         mimeData = event.mimeData()
@@ -365,15 +369,14 @@ class LanguageCanvas(QGraphicsScene):
             items, canvas=self, pos=event.scenePos(), move_action=False, parent=None,
             source_items=mimeData.drag_items,
             source_canvas=mimeData.drag_from_canvas))
+
+        for item in items:
+            if isinstance(item, Object):   # BUGFIX: remember to snap then update arrows here.
+                item.setPos(item.pos(), snap=True, update=True)             
         
-        #for item in items:
-            #item.update()
-            
         for item in items:
             if isinstance(item, Arrow):
-                item.update()
-                
-        #QApplication.instance().topmost_main_window.restore_collision_response_setting()
+                item.update()                
                        
     @staticmethod
     def pickle_items(items:list):
@@ -515,7 +518,7 @@ class LanguageCanvas(QGraphicsScene):
             self._labelText = self.init_label_text
         return text
     
-    _autoIndexRegex = re.compile(r'{(?P<direc>-?)@(?P<index>.+)}')
+    _autoIndexRegex = re.compile(r'\{(?P<direc>-?)@(?P<index>(-?[0-9]+)|[a-zA-Z])\}')
     
     def auto_index_text(self, text:str) -> tuple:
         auto_index = text
@@ -532,7 +535,7 @@ class LanguageCanvas(QGraphicsScene):
                 index += direc
                 index = str(index)
             except:
-                index = ord(index[0])
+                index = ord(index)
                 index += direc
                 index = chr(index)
             if direc == -1:
@@ -542,6 +545,8 @@ class LanguageCanvas(QGraphicsScene):
             next_index = f'{{{direc}{index}}}'
             auto_index = auto_index.replace(match.group(), next_index)
             text = text.replace(match.group(), current_index)
+            
+        text = convert_unicode_scripts(text)
         return text, auto_index
     
     def text(self, text:str, item=None):
@@ -555,3 +560,14 @@ class LanguageCanvas(QGraphicsScene):
             self._arrowText = auto_text
         return text, auto_text
             
+            
+    def keyPressEvent(self, event):
+        if event.modifiers() & Qt.ControlModifier:                
+            for view in self.views():
+                view.setDragMode(view.ScrollHandDrag)                
+        super().keyPressEvent(event)
+        
+    def keyReleaseEvent(self, event):
+        if event.modifiers() & Qt.ControlModifier:
+            for view in self.views():
+                view.setDragMode(view.RubberBandDrag)    
